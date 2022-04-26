@@ -37,9 +37,14 @@ class Form(StatesGroup):
 
 @dp.message_handler(commands='start')
 async def cmd_start(message: types.Message):
+    await message.reply("Введіть /login для входу!")
+    await message.reply("Введіть /register для реєстрації!")
+
+
+@dp.message_handler(commands='register')
+async def cmd_start(message: types.Message):
     # Set state
     await Form.login.set()
-
     await message.reply("Твій логін?")
 
 
@@ -65,6 +70,7 @@ async def process_name(message: types.Message, state: FSMContext):
 
     await Form.next()
     await message.reply("Твій пароль?")
+
 
 @dp.message_handler(state=Form.password)
 async def process_age(message: types.Message, state: FSMContext):
