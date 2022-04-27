@@ -2,6 +2,8 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 from aiogram import types, Dispatcher
 from bot_create import cursor, connection
+from keyboard import st_keyboard
+from keyboard import tch_keyboard
 class FormLogin(StatesGroup):
     login = State()  # Will be represented in storage as 'Form:login'
     password = State()  # Will be represented in storage as 'Form:password'
@@ -36,14 +38,20 @@ async def load_password(message: types.Message, state: FSMContext):
             user_sp = row["user_sp"]
             user_course = row["user_course"]
             user_group = row["user_group"]
+            user_role = row["user_role"]
         if user_password == password:
-            await message.answer("Ви успішно ввійшли")
-            await message.answer("Вітаємо!\n"
-                                 "Ваші дані: \n"
-                                 "ПІБ: " + user_PIB + "\n"
-                                 "Навчальна програма: " + user_sp + "\n"
-                                 "Курс: " + str(user_course) + "\n"
-                                 "Група: " + str(user_group))
+            # await message.answer("Ви успішно ввійшли")
+            if user_role == 1:
+                await message.answer("Вітаємо!\nВаші дані:\nПІБ: "+user_PIB+"\nНавчальна програма: " + user_sp + "\n"
+                                    "Курс: "+str(user_course)+"\nГрупа: "+str(user_group), reply_markup=st_keyboard)
+            elif user_role == 2:
+                await message.answer(
+                    "Вітаємо!\nВаші дані:\nПІБ: " + user_PIB + "\nНавчальна програма: " + user_sp + "\n"
+                    "Курс: " + str(user_course) + "\nГрупа: " + str(user_group), reply_markup=tch_keyboard)
+            else:
+                await message.answer(
+                    "Вітаємо!\nВаші дані:\nПІБ: " + user_PIB + "\nНавчальна програма: " + user_sp + "\n"
+                    "Курс: " + str(user_course) + "\nГрупа: " + str(user_group), reply_markup=tch_keyboard)
         else:
             await message.answer("Пароль неправильний")
         connection.commit()

@@ -4,6 +4,7 @@ import logging
 from aiogram import types, Dispatcher
 from aiogram.dispatcher.filters import Text
 from bot_create import cursor, connection
+from keyboard import first_keyboard
 
 
 class FormRegister(StatesGroup):
@@ -69,7 +70,7 @@ async def load_sp(message: types.Message, state: FSMContext):
     await FormRegister.next()
     # Configure ReplyKeyboardMarkup
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
-    markup.add("1", "2", "3", "4")
+    markup.add("1", "2", "3", "4", "5", "6")
 
     await message.answer("Твій курс?", reply_markup=markup)
 
@@ -84,7 +85,7 @@ async def load_course(message: types.Message, state: FSMContext):
         await FormRegister.next()
         # Configure ReplyKeyboardMarkup
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
-        markup.add("1", "2", "3", "4")
+        markup.add("1", "2", "3", "4", "5")
 
         await message.answer("Твоя група?", reply_markup=markup)
 
@@ -97,7 +98,6 @@ async def load_group(message: types.Message, state: FSMContext):
     # Update state and data
     async with state.proxy() as data:
         data['group'] = message.text
-
         user_login = data['login']
         user_password = data['password']
         user_PIB = data['PIB']
@@ -119,7 +119,8 @@ async def load_group(message: types.Message, state: FSMContext):
                          "ПІБ: " + user_PIB + "\n"
                          "Навчальна програма: " + user_sp + "\n"
                          "Курс: " + user_course + "\n"
-                         "Група: " + user_group)
+                         "Група: " + user_group,
+                         reply_markup=first_keyboard)
 
 
 def register_handlers_register(dp: Dispatcher):
@@ -130,7 +131,7 @@ def register_handlers_register(dp: Dispatcher):
     dp.register_message_handler(load_PIB, state=FormRegister.PIB)
     dp.register_message_handler(mistake_sp, lambda message: message.text not in ["IPZ", "PP", "AND", "KN"], state=FormRegister.sp)
     dp.register_message_handler(load_sp, state=FormRegister.sp)
-    dp.register_message_handler(mistake_course, lambda message: message.text not in ["1", "2", "3", "4"], state=FormRegister.course)
+    dp.register_message_handler(mistake_course, lambda message: message.text not in ["1", "2", "3", "4", "5", "6"], state=FormRegister.course)
     dp.register_message_handler(load_course, state=FormRegister.course)
-    dp.register_message_handler(mistake_group, lambda message: message.text not in ["1", "2", "3", "4"], state=FormRegister.group)
+    dp.register_message_handler(mistake_group, lambda message: message.text not in ["1", "2", "3", "4", "5"], state=FormRegister.group)
     dp.register_message_handler(load_group, state=FormRegister.group)
