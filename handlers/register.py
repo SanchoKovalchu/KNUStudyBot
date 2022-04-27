@@ -2,19 +2,17 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 import logging
 from aiogram import types, Dispatcher
-import aiogram.utils.markdown as md
 from aiogram.dispatcher.filters import Text
-from aiogram.types import ParseMode
-from bot_create import cursor, bot, connection
+from bot_create import cursor, connection
 
 
 class FormRegister(StatesGroup):
     login = State()  # Will be represented in storage as 'Form:login'
     password = State()  # Will be represented in storage as 'Form:password'
     PIB = State()  # Will be represented in storage as 'Form:PIB'
-    sp = State()  # Will be represented in storage as 'Form:PIB'
+    sp = State()  # Will be represented in storage as 'Form:sp'
     course = State()  # Will be represented in storage as 'Form:course'
-    group = State()  # Will be represented in storage as 'Form:course'
+    group = State()  # Will be represented in storage as 'Form:group'
 
 
 async def register_command(message: types.Message):
@@ -106,21 +104,6 @@ async def load_group(message: types.Message, state: FSMContext):
         user_sp = data['sp']
         user_course = data['course']
         user_group = data['group']
-
-        # markup = types.ReplyKeyboardRemove()
-        # await bot.send_message(
-        #     message.chat.id,
-        #     md.text(
-        #         md.text('Логін', md.bold(data['login'])),
-        #         md.text('Пароль:', md.code(data['password'])),
-        #         md.text('ПІБ:', data['PIB']),
-        #         md.text('Курс:', data['course']),
-        #         md.text('Група:', data['group']),
-        #         sep='\n',
-        #     ),
-        #     reply_markup=markup,
-        #     parse_mode=ParseMode.MARKDOWN,
-        # )
     await state.finish()
 
     sql = "INSERT INTO MySQLTestForBot (user_id, user_login, user_password, user_PIB, user_sp, user_course, user_group) " \
@@ -137,6 +120,7 @@ async def load_group(message: types.Message, state: FSMContext):
                          "Навчальна програма: " + user_sp + "\n"
                          "Курс: " + user_course + "\n"
                          "Група: " + user_group)
+
 
 def register_handlers_register(dp: Dispatcher):
     dp.register_message_handler(register_command, lambda message: message.text == "Реєстрація")

@@ -6,8 +6,6 @@ from aiogram import types, Dispatcher
 # import bot_key
 from bot_create import cursor, bot, connection
 
-# bot = bot_key.getBot()
-
 
 class FSMFiles(StatesGroup):
     photo = State()
