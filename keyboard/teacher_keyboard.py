@@ -1,10 +1,11 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 disciplines_bt = KeyboardButton('Перелік дисциплін')
 groups_bt = KeyboardButton('Групи студентів')
+groups_bt = KeyboardButton('Оголошення')
 material_bt = KeyboardButton('Матеріал')
 tests_bt = KeyboardButton('Тести')
 settings_bt = KeyboardButton('Налаштування')
-# photo_bt = KeyboardButton('Фото')
+
 
 
 tch_keyboard = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
