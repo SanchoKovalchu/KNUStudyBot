@@ -1,4 +1,5 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
+
 disciplines_bt = KeyboardButton('Перелік дисциплін')
 groups_bt = KeyboardButton('Групи студентів')
 groups_bt = KeyboardButton('Оголошення')
