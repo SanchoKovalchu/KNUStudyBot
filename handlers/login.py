@@ -30,29 +30,40 @@ async def load_password(message: types.Message, state: FSMContext):
         login = data['login']
         password = data['password']
         await state.finish()
-        sql = "SELECT * FROM MySQLTestForBot WHERE user_login = %s"
+        sql = "SELECT * FROM signIn_data WHERE user_login = %s"
         cursor.execute(sql, login)
         #
         for row in cursor:
             user_password = row["user_password"]
-            user_PIB = row["user_PIB"]
-            user_sp = row["user_sp"]
-            user_course = row["user_course"]
-            user_group = row["user_group"]
+            user_id = row["user_id"]
             user_role = row["user_role"]
         if user_password == password:
             # await message.answer("Ви успішно ввійшли")
             if user_role == 1:
-                await message.answer("Вітаємо!\nВаші дані:\nПІБ: "+user_PIB+"\nНавчальна програма: " + user_sp + "\n"
-                                    "Курс: "+str(user_course)+"\nГрупа: "+str(user_group), reply_markup=st_keyboard)
+                sql = "SELECT * FROM student_data WHERE user_id = %s"
+                cursor.execute(sql, user_id)
+                for row in cursor:
+                    PIB = row["PIB"]
+                    sp = row["sp"]
+                    course = row["course"]
+                    group = row["group"]
+                await message.answer("Вітаємо!\nВаші дані:\nПІБ: "+PIB+"\nНавчальна програма: " + sp + "\n"
+                                    "Курс: "+str(course)+"\nГрупа: "+str(group), reply_markup=st_keyboard)
             elif user_role == 2:
+                sql = "SELECT * FROM teacher_data WHERE user_id = %s"
+                cursor.execute(sql, user_id)
+                for row in cursor:
+                    PIB = row["PIB"]
+                    cathedra = row["cathedra"]
                 await message.answer(
-                    "Вітаємо!\nВаші дані:\nПІБ: " + user_PIB + "\nНавчальна програма: " + user_sp + "\n"
-                    "Курс: " + str(user_course) + "\nГрупа: " + str(user_group), reply_markup=tch_keyboard)
+                    "Вітаємо!\nВаші дані:\nПІБ: " + PIB + "\nКафедра: " + str(cathedra), reply_markup=tch_keyboard)
             else:
+                sql = "SELECT * FROM admin_data WHERE user_id = %s"
+                cursor.execute(sql, user_id)
+                for row in cursor:
+                    PIB = row["PIB"]
                 await message.answer(
-                    "Вітаємо!\nВаші дані:\nПІБ: " + user_PIB + "\nНавчальна програма: " + user_sp + "\n"
-                    "Курс: " + str(user_course) + "\nГрупа: " + str(user_group), reply_markup=tch_keyboard)
+                    "Вітаємо!\nВаші дані:\nПІБ: " + PIB, reply_markup=tch_keyboard)
         else:
             await message.answer("Пароль неправильний")
         connection.commit()
