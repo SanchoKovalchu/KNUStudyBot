@@ -46,7 +46,7 @@ async def load_password(message: types.Message, state: FSMContext):
                     PIB = row["PIB"]
                     sp = row["sp"]
                     course = row["course"]
-                    group = row["group"]
+                    group = row["st_group"]
                 await message.answer("Вітаємо!\nВаші дані:\nПІБ: "+PIB+"\nНавчальна програма: " + sp + "\n"
                                     "Курс: "+str(course)+"\nГрупа: "+str(group), reply_markup=st_keyboard)
             elif user_role == 2:
