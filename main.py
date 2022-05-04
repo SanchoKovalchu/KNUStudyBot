@@ -5,6 +5,7 @@ from handlers import register
 from handlers import announcement
 from handlers import disciplines
 from handlers.teacher_material_dir import add_material
+from handlers.teacher_material_dir import add_additional_material
 from handlers.teacher_material_dir import edit_material
 from handlers.teacher_material_dir import delete_material
 from handlers.teacher_material_dir import view_material
@@ -13,6 +14,7 @@ from keyboard import first_keyboard
 from user_role_files import teacher
 
 add_material.register_handlers_files(dp)
+add_additional_material.register_handlers_files(dp)
 edit_material.register_handlers_files(dp)
 delete_material.register_handlers_files(dp)
 view_material.register_handlers_files(dp)
