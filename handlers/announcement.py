@@ -9,7 +9,7 @@ class FormAnnounce(StatesGroup):
     course = State()
     sp = State()
     group = State()
-    student = State()
+    person = State()
     content = State()
     confirmation = State()
 
@@ -18,7 +18,7 @@ async def announcement_command(message: types.Message):
     # Set state
     await FormAnnounce.receivers.set()
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
-    markup.add("Курс", "Спеціальність", "Група", "Студент")
+    markup.add("Курс", "Спеціальність", "Група", "Студент", "Викладач")
     await message.reply("Хто має отримати повідомлення?", reply_markup=markup)
 
 async def mistake_receivers(message: types.Message):
@@ -28,13 +28,16 @@ async def load_receivers(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['receivers'] = message.text
         user_receivers = data['receivers']
-    if user_receivers != 'Студент':
+    if user_receivers == 'Викладач':
+        await FormAnnounce.person.set()
+        await message.reply("Введіть ПІБ викладача:")
+    elif user_receivers != 'Студент':
         await FormAnnounce.next()
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
         markup.add("1", "2", "3", "4", "5", "6")
         await message.reply("Який курс?", reply_markup=markup)
     else:
-        await FormAnnounce.student.set()
+        await FormAnnounce.person.set()
         await message.reply("Введіть ПІБ студента:")
 
 async def mistake_course(message: types.Message):
@@ -84,7 +87,6 @@ async def load_PIB(message: types.Message, state: FSMContext):
     await FormAnnounce.content.set()
     await message.reply("Введіть текст повідомлення", reply_markup=types.ReplyKeyboardRemove())
 
-
 async def load_content(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['content'] = message.text
@@ -95,7 +97,7 @@ async def load_content(message: types.Message, state: FSMContext):
             user_sp = data['sp']
         if user_receivers == 'Група':
             user_group = data['group']
-        if user_receivers == 'Студент':
+        if user_receivers == 'Студент' or user_receivers == 'Викладач':
             user_PIB = data['PIB']
         user_content = data['content']
     if user_receivers == 'Курс':
@@ -106,6 +108,8 @@ async def load_content(message: types.Message, state: FSMContext):
         await message.answer("Таке повідомлення буде надіслано студентам групи" + user_sp + "-" + user_course+user_group+":")
     elif user_receivers == 'Студент':
         await message.answer("Таке повідомлення буде надіслано студенту, ПІБ якого " + user_PIB+":")
+    elif user_receivers == 'Викладач':
+        await message.answer("Таке повідомлення буде надіслано викладачу, ПІБ якого " + user_PIB + ":")
     await message.answer(user_content)
     await FormAnnounce.confirmation.set()
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
@@ -129,24 +133,28 @@ async def load_confirmation(message: types.Message, state: FSMContext):
                 user_sp = data['sp']
             if user_receivers == 'Група':
                 user_group = data['group']
-            if user_receivers == 'Студент':
+            if user_receivers == 'Студент' or user_receivers == 'Викладач':
                 user_PIB = data['PIB']
             user_content = data['content']
         await state.finish()
         if user_receivers=='Курс':
-            sql = "SELECT * FROM MySQLTestForBot WHERE user_course = %s"
+            sql = "SELECT * FROM student_data WHERE course = %s"
             cursor.execute(sql, user_course)
             rec = cursor.fetchall()
         elif user_receivers=='Спеціальність':
-            sql = "SELECT * FROM MySQLTestForBot WHERE user_course = %s AND user_sp = %s"
+            sql = "SELECT * FROM student_data WHERE course = %s AND sp = %s"
             cursor.execute(sql, (user_course, user_sp))
             rec = cursor.fetchall()
         elif user_receivers=='Група':
-            sql = "SELECT * FROM MySQLTestForBot WHERE user_course = %s AND user_sp = %s AND user_group = %s"
+            sql = "SELECT * FROM student_data WHERE course = %s AND sp = %s AND st_group = %s"
             cursor.execute(sql, (user_course, user_sp, user_group))
             rec = cursor.fetchall()
+        elif user_receivers=='Студент':
+            sql = "SELECT * FROM student_data WHERE PIB = %s"
+            cursor.execute(sql, user_PIB)
+            rec = cursor.fetchall()
         else:
-            sql = "SELECT * FROM MySQLTestForBot WHERE user_PIB = %s"
+            sql = "SELECT * FROM teacher_data WHERE PIB = %s"
             cursor.execute(sql, user_PIB)
             rec = cursor.fetchall()
         for row in rec:
@@ -155,7 +163,7 @@ async def load_confirmation(message: types.Message, state: FSMContext):
 
 def register_handlers_announcement(dp: Dispatcher):
     dp.register_message_handler(announcement_command, lambda message: message.text == "Оголошення")
-    dp.register_message_handler(mistake_receivers, lambda message: message.text not in ["Курс", "Спеціальність", "Група", "Студент"], state=FormAnnounce.receivers)
+    dp.register_message_handler(mistake_receivers, lambda message: message.text not in ["Курс", "Спеціальність", "Група", "Студент", "Викладач"], state=FormAnnounce.receivers)
     dp.register_message_handler(load_receivers, state=FormAnnounce.receivers)
     dp.register_message_handler(mistake_course,lambda message: message.text not in ["1", "2", "3", "4", "5", "6"],state=FormAnnounce.course)
     dp.register_message_handler(load_course, state=FormAnnounce.course)
@@ -163,7 +171,7 @@ def register_handlers_announcement(dp: Dispatcher):
     dp.register_message_handler(load_sp, state=FormAnnounce.sp)
     dp.register_message_handler(mistake_group, lambda message: message.text not in ["1", "2", "3", "4", "5"],state=FormAnnounce.group)
     dp.register_message_handler(load_group, state=FormAnnounce.group)
-    dp.register_message_handler(load_PIB, state=FormAnnounce.student)
+    dp.register_message_handler(load_PIB, state=FormAnnounce.person)
     dp.register_message_handler(load_content, state=FormAnnounce.content)
     dp.register_message_handler(mistake_confirmation, lambda message: message.text not in ["Надіслати", "Відмінити"], state=FormAnnounce.confirmation)
     dp.register_message_handler(load_confirmation, state=FormAnnounce.confirmation)
