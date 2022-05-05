@@ -55,6 +55,11 @@ def get_keyboard(num: int, line):
             keyboard = types.InlineKeyboardMarkup(row_width=2)
             keyboard.add(*buttons)
             return keyboard
+    elif test_json_decoder.MyClass.num2 == 5:
+        buttons = [types.InlineKeyboardButton(text="Choose", callback_data="ans_Ch2")]
+        keyboard = types.InlineKeyboardMarkup(row_width=1)
+        keyboard.add(*buttons)
+        return keyboard
     else:
         if str(line)[num] == '_':
             if num == 0:
@@ -172,7 +177,7 @@ async def update_num_text(message: types.Message, task_number: int, user_savedan
     #Оновлення тексту питань
     if test_json_decoder.MyClass.num2 == 0:
         await message.edit_text("Оберіть назву предмета\n" + "\nПоточний предмет: " + test_json_decoder.subject_list[task_number], reply_markup=get_keyboard(task_number, user_savedans))
-    elif test_json_decoder.MyClass.num2 == 1:
+    elif test_json_decoder.MyClass.num2 == 1 or test_json_decoder.MyClass.num2 == 5:
         await message.edit_text("Оберіть номер тесту\n" + "\nПоточний тест: " + str(task_number + 1), reply_markup=get_keyboard(task_number, user_savedans))
     elif numofquestions[task_number] == 2:
         await message.edit_text("Питання " + str(task_number + 1) + "\n" + question[task_number] + "\nОберіть відповідь: \n" + answervarA[task_number] + "\n" + answervarB[task_number], reply_markup=get_keyboard(task_number, user_savedans))
@@ -190,6 +195,11 @@ async def callbacks_num(call: types.CallbackQuery):
         test_json_decoder.MyClass.num2 = int(1)
         test_json_decoder.MyClass.subject = str(test_json_decoder.subject_list[user_tasknumber])
         user_task[call.from_user.id] = 0
+        await test_json_decoder.count_tests(test_json_decoder.MyClass.subject)
+        if (test_json_decoder.MyClass.numoftests == 1):
+            test_json_decoder.MyClass.num2 = int(5)
+        else:
+            test_json_decoder.MyClass.num3 = int(test_json_decoder.MyClass.numoftests) - 1
         await update_num_text(call.message, 0, user_savedans)
     elif action == "Ch2":
         test_json_decoder.MyClass.num2 = int(2)
@@ -207,7 +217,6 @@ async def callbacks_num(call: types.CallbackQuery):
         user_answersave[call.from_user.id] = stringstr
         await update_num_text(call.message, user_tasknumber, stringstr)
     elif action == "Next":
-        print(user_savedans)
         user_task[call.from_user.id] = user_tasknumber + 1
         await update_num_text(call.message, user_tasknumber + 1, user_savedans)
     elif action == "Previous":
