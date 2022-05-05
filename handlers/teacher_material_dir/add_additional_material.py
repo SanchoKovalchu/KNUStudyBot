@@ -3,7 +3,6 @@ from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import  State, StatesGroup
 from keyboard.teacher_keyboard import tch_keyboard
 from keyboard.discipline_keyboard import dsp_keyboard, list
-#from keyboard.addmaterial_keyboard import am_keyboard  # Додаткове
 from aiogram import types, Dispatcher
 # import bot_key
 from bot_create import cursor, bot, connection
@@ -16,6 +15,10 @@ class FSMFiles(StatesGroup):
     name_ = State()
     description_ = State()
     send_date_ = State()
+    add_date_ = State()
+
+
+
 
 
 async def cm_start_(message : types.Message):
@@ -66,27 +69,43 @@ async def file_description_(message : types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['description'] = message.text
 
-
-        await FSMFiles.next()
-        await message.reply("Введіть дату та час відправлення.\n Приклад: 2022-01-20 08:03:20")
+    await FSMFiles.next()
+    await message.reply("Введіть дату та час відправлення.\n Приклад: 2022-01-20 08:03:20")
 
 
 async def file_send_date_(message : types.Message, state: FSMContext):
     async with state.proxy() as data:
-        data['send_date'] = message.text
+        data['date_time'] = message.text
+
 
     async with state.proxy() as data:
-        sql = "INSERT INTO 	add_file_storage (name, description, file_id, file_type, subject, send_date) " \
-              + " VALUES (%s, %s, %s, %s, %s, %s) "
+        sql = "INSERT INTO 	file_storage (name, description, file_id, file_type, subject) " \
+        + " VALUES (%s, %s, %s, %s, %s) "
+
+
         # Выполнить sql и передать 3 параметра.
         subject = data['subject']
         file_type = data['type']
         file_id = data['file_id']
         name = data['name']
         description = data['description']
-        send_date = data['send_date']
-        cursor.execute(sql, (name, description, file_id, file_type, subject, send_date))
+        cursor.execute(sql, (name, description, file_id, file_type, subject))
         connection.commit()
+
+
+    async with state.proxy() as data:
+        sql = "INSERT INTO 	add_file_storage (file_id, date_time) " \
+              + " VALUES (%s, %s) "
+
+        # Выполнить sql и передать 3 параметра.
+        file_id = data['file_id']
+        date_time = data['date_time']
+        cursor.execute(sql, (file_id, date_time))
+        connection.commit()
+
+
+
+
         await message.reply("Заплановано!", reply_markup=tch_keyboard)
         await state.finish()
 
