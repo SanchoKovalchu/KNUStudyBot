@@ -11,8 +11,6 @@
 #                              cursorclass=pymysql.cursors.DictCursor)
 #
 # cursor = connection.cursor()
-#
-#
 # def send_message():
 #     print("Get ready!")
 #     sql = "SELECT * FROM add_file_storage"
