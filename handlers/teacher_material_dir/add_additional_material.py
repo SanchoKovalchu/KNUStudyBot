@@ -6,8 +6,9 @@ from keyboard.discipline_keyboard import dsp_keyboard, list
 from aiogram import types, Dispatcher
 # import bot_key
 from bot_create import cursor, bot, connection
-
-
+import json
+from datetime import datetime
+import time
 
 class FSMFiles(StatesGroup):
     discipline_ = State()
@@ -70,27 +71,40 @@ async def file_description_(message : types.Message, state: FSMContext):
         data['description'] = message.text
 
     await FSMFiles.next()
-    await message.reply("Введіть дату та час відправлення.\n Приклад: 2022-01-20 08:03:20")
+    await message.reply("Введіть дату та час відправлення.\n Приклад: 18-09-20 01:55:19")
 
 
 async def file_send_date_(message : types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        data['date_time'] = message.text
+    date_time_str = [str(data_time_str) for data_time_str in message.text.split(', ')]
+    unixtime_ = ""
+    for i in range(len(date_time_str)):
+       # if i+1<=len(date_time_str):
+        unixtime = datetime.strptime(date_time_str[i], '%d-%m-%y %H:%M:%S')
+        unixtime = time.mktime(unixtime.timetuple())
+        if i==0:
+            unixtime_ = str(unixtime)
+        else:
+            unixtime_ = unixtime_ + ', ' + str(unixtime)
 
 
+
     async with state.proxy() as data:
-        sql = "INSERT INTO 	file_storage (name, description, file_id, file_type, subject) " \
-        + " VALUES (%s, %s, %s, %s, %s) "
+        data['date_time'] = unixtime_
+
+
+   # async with state.proxy() as data:
+    #    sql = "INSERT INTO 	file_storage (name, description, file_id, file_type, subject) " \
+     #   + " VALUES (%s, %s, %s, %s, %s) "
 
 
         # Выполнить sql и передать 3 параметра.
-        subject = data['subject']
-        file_type = data['type']
-        file_id = data['file_id']
-        name = data['name']
-        description = data['description']
-        cursor.execute(sql, (name, description, file_id, file_type, subject))
-        connection.commit()
+      #  subject = data['subject']
+      #  file_type = data['type']
+      #  file_id = data['file_id']
+      #  name = data['name']
+      #  description = data['description']
+      #  cursor.execute(sql, (name, description, file_id, file_type, subject))
+      #  connection.commit()
 
 
     async with state.proxy() as data:
@@ -100,6 +114,8 @@ async def file_send_date_(message : types.Message, state: FSMContext):
         # Выполнить sql и передать 3 параметра.
         file_id = data['file_id']
         date_time = data['date_time']
+        aList = ["1", "2", "3"]
+        res = json.dumps(aList)
         cursor.execute(sql, (file_id, date_time))
         connection.commit()
 
