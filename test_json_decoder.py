@@ -11,10 +11,12 @@ class MyClass:
     num2 = int(0)
     num3 = int(0)
     numoftest = int(0)
+    numoftests = int(0)
     subject = ""
 
 async def count_tests(line):
-    MyClass.numoftests = "SELECT COUNT(test_subject) from teachers_tests where test_subject= line"
+    sql = "SELECT * FROM teachers_tests WHERE test_subject = %s"
+    MyClass.numoftests = cursor.execute(sql, line)
 
 async def get_info():
     sql = "SELECT * FROM teachers_tests WHERE test_owner = %s AND test_subject = %s AND test_name = %s"
@@ -29,7 +31,6 @@ async def get_info():
     tests.question = json_string_decoded["question"]
     tests.question_value = json_string_decoded["question_value"]
     tests.answervarA = json_string_decoded["answervarA"]
-    print(json_string_decoded["answervarA"])
     tests.answervarB = json_string_decoded["answervarB"]
     tests.answervarC = json_string_decoded["answervarC"]
     tests.answervarD = json_string_decoded["answervarD"]
