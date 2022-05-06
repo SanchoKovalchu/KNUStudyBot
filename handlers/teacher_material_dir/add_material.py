@@ -4,7 +4,6 @@ from aiogram.dispatcher.filters.state import  State, StatesGroup
 from keyboard.teacher_keyboard import tch_keyboard
 from keyboard.discipline_keyboard import dsp_keyboard, list
 from aiogram import types, Dispatcher
-# import bot_key
 from bot_create import cursor, bot, connection
 
 class FSMFiles(StatesGroup):
@@ -13,7 +12,6 @@ class FSMFiles(StatesGroup):
     name = State()
     description = State()
 
-
 async def cm_start(message : types.Message):
     await FSMFiles.discipline.set()
     await bot.send_message(message.chat.id, "Виберіть дисципліну, до якої хочете завантажити файл", reply_markup=dsp_keyboard)
@@ -21,7 +19,7 @@ async def cm_start(message : types.Message):
 async def mistake_disciplines(message: types.Message):
     return await message.reply("Помилка. Оберіть дисципліну з клавіатури")
 
-async def choose_discipline(message : types.message, state: FSMContext):
+async def choose_discipline(message : types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['subject'] = message.text
     await FSMFiles.next()
@@ -52,9 +50,6 @@ async def upload_file(message : types.Message, state: FSMContext):
 async def file_name(message : types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['name'] = message.text
-
-
-
     await FSMFiles.next()
     await message.reply("Опишіть вміст файлу")
 
@@ -62,10 +57,8 @@ async def file_name(message : types.Message, state: FSMContext):
 async def file_description(message : types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['description'] = message.text
-
-
     async with state.proxy() as data:
-        sql = "INSERT INTO 	file_storage (name, description, file_id, file_type, subject) " \
+        sql = "INSERT INTO 	file_storage (file_name, description, file_id, file_type, subject) " \
               + " VALUES (%s, %s, %s, %s, %s) "
         # Выполнить sql и передать 3 параметра.
         subject = data['subject']

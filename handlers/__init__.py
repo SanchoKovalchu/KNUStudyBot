@@ -5,3 +5,4 @@ from handlers import disciplines
 from handlers import tests
 from handlers import marks
 from handlers.register_dir import teacher_register, student_register, admin_register
+from handlers import test_json_decoder
