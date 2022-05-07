@@ -33,20 +33,21 @@ async def sql_read_file(message: types.message, state: FSMContext):
     cursor.execute(sql, message.text)
     for row in cursor.fetchall():
         message_text = f'Назва: {row["file_name"]}\nОпис: {row["description"]}'
-        if row["file_type"] == 'photo':
-            await bot.send_photo(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
-        elif row["file_type"] == 'video':
-            await bot.send_video(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
-        elif row["file_type"] == 'audio':
-            await bot.send_audio(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
-        elif row["file_type"] == 'voice':
-            await bot.send_voice(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
-        elif row["file_type"] == 'animation':
-            await bot.send_animation(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
-        elif row["file_type"] == 'video_note':
-            await bot.send_video_note(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
-        else:
-            await bot.send_document(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
+        match row["file_type"]:
+            case 'photo':
+                await bot.send_photo(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
+            case 'video':
+                await bot.send_video(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
+            case 'audio':
+                await bot.send_audio(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
+            case 'voice':
+                await bot.send_voice(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
+            case 'animation':
+                await bot.send_animation(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
+            case 'video_note':
+                await bot.send_video_note(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
+            case _:
+                await bot.send_document(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
     await state.finish()
 
 async def callbacks_command(call: types.CallbackQuery):
