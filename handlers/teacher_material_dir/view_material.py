@@ -8,6 +8,8 @@ from handlers.teacher_material_dir.edit_material import cm_start_edit
 from handlers.teacher_material_dir.delete_material import cm_start_delete
 from aiogram.dispatcher.filters import Text
 
+from handlers.login import UserRoles
+
 class FSMViewFiles(StatesGroup):
     discipline = State()
     choose_file = State()
@@ -33,20 +35,21 @@ async def sql_read_file(message: types.message, state: FSMContext):
     cursor.execute(sql, message.text)
     for row in cursor.fetchall():
         message_text = f'Назва: {row["file_name"]}\nОпис: {row["description"]}'
-        if row["file_type"] == 'photo':
-            await bot.send_photo(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
-        elif row["file_type"] == 'video':
-            await bot.send_video(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
-        elif row["file_type"] == 'audio':
-            await bot.send_audio(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
-        elif row["file_type"] == 'voice':
-            await bot.send_voice(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
-        elif row["file_type"] == 'animation':
-            await bot.send_animation(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
-        elif row["file_type"] == 'video_note':
-            await bot.send_video_note(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
-        else:
-            await bot.send_document(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
+        match row["file_type"]:
+            case 'photo':
+                await bot.send_photo(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
+            case 'video':
+                await bot.send_video(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
+            case 'audio':
+                await bot.send_audio(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
+            case 'voice':
+                await bot.send_voice(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
+            case 'animation':
+                await bot.send_animation(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
+            case 'video_note':
+                await bot.send_video_note(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
+            case _:
+                await bot.send_document(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
     await state.finish()
 
 async def callbacks_command(call: types.CallbackQuery):
@@ -57,7 +60,7 @@ async def callbacks_command(call: types.CallbackQuery):
         await cm_start_delete(call.data,call.from_user.id)
 
 def register_handlers_files(dp : Dispatcher):
-    dp.register_message_handler(cm_start, lambda message: message.text == "Переглянути матеріал", state=None)
+    dp.register_message_handler(cm_start, lambda message: message.text == "Переглянути матеріал", state=UserRoles.teacher)
     dp.register_message_handler(mistake_discipline, lambda message: message.text not in list, state=FSMViewFiles.discipline)
     dp.register_message_handler(sql_read_file, state=FSMViewFiles.discipline)
     dp.register_callback_query_handler(callbacks_command, Text(endswith=['edit','delete']))

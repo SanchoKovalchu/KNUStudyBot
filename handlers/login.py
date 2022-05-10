@@ -5,6 +5,12 @@ from bot_create import cursor, connection
 from keyboard import st_keyboard
 from keyboard import tch_keyboard
 
+
+class UserRoles(StatesGroup):
+    student = State()
+    teacher = State()
+    admin = State()
+
 class FormLogin(StatesGroup):
     login = State()  # Will be represented in storage as 'Form:login'
     password = State()  # Will be represented in storage as 'Form:password'
@@ -40,6 +46,7 @@ async def load_password(message: types.Message, state: FSMContext):
         if user_password == password:
             # await message.answer("Ви успішно ввійшли")
             if user_role == 1:
+                await UserRoles.student.set()
                 sql = "SELECT * FROM student_data WHERE user_id = %s"
                 cursor.execute(sql, user_id)
                 for row in cursor:
@@ -50,6 +57,7 @@ async def load_password(message: types.Message, state: FSMContext):
                 await message.answer("Вітаємо!\nВаші дані:\nПІБ: "+PIB+"\nНавчальна програма: " + sp + "\n"
                                     "Курс: "+str(course)+"\nГрупа: "+str(group), reply_markup=st_keyboard)
             elif user_role == 2:
+                await UserRoles.teacher.set()
                 sql = "SELECT * FROM teacher_data WHERE user_id = %s"
                 cursor.execute(sql, user_id)
                 for row in cursor:

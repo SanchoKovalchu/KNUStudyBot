@@ -1,7 +1,7 @@
 from aiogram.dispatcher.filters import Text
 from aiogram import types, Dispatcher
 from handlers import test_json_decoder
-
+from handlers.login import UserRoles
 user_data = {}
 user_task = {}
 user_answersave = {}
@@ -238,6 +238,6 @@ async def callbacks_num(call: types.CallbackQuery):
 
 
 def register_handlers_tests(dp: Dispatcher):
-    dp.register_message_handler(cmd_numbers, lambda message: message.text == "Тести")
+    dp.register_message_handler(cmd_numbers, lambda message: message.text == "Тести", state=UserRoles.teacher)
     # dp.register_message_handler(cmd_numbers, commands="choose")
     dp.register_callback_query_handler(callbacks_num, Text(startswith="ans_"))

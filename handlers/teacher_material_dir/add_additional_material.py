@@ -2,6 +2,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import  State, StatesGroup
 from keyboard.teacher_keyboard import tch_keyboard
+from keyboard.student_keyboard import st_keyboard
 from keyboard.discipline_keyboard import dsp_keyboard, list
 from aiogram import types, Dispatcher
 # import bot_key
@@ -9,9 +10,13 @@ from bot_create import cursor, bot, connection
 import json
 from datetime import datetime
 import time
+from handlers.login import UserRoles
+
+
 
 class FSMFiles(StatesGroup):
     discipline_ = State()
+    group_ = State()
     document_ = State()
     name_ = State()
     description_ = State()
@@ -23,15 +28,30 @@ class FSMFiles(StatesGroup):
 
 
 async def cm_start_(message : types.Message):
-    await FSMFiles.discipline_.set()
-    await bot.send_message(message.chat.id, "Виберіть дисципліну, до якої хочете завантажити додатковий файл", reply_markup=dsp_keyboard)
-
+    # print(user_role.user_role_id)
+    # if not_enough_rights.user_role_checker(user_role.user_role_id, 2, 1):
+        await FSMFiles.discipline_.set()
+        await bot.send_message(message.chat.id, "Виберіть дисципліну, до якої хочете завантажити додатковий файл", reply_markup=dsp_keyboard)
+    # else:
+    #     if user_role.user_role_id == 1:
+    #
+    #         await bot.send_message(message.chat.id, "Ви не маєте достатньо прав!", reply_markup=st_keyboard)
 async def mistake_disciplines_(message: types.Message):
     return await message.reply("Помилка. Оберіть дисципліну з клавіатури")
+
+
 
 async def choose_discipline_(message : types.message, state: FSMContext):
     async with state.proxy() as data:
         data['subject'] = message.text
+    await FSMFiles.next()
+    await bot.send_message(message.chat.id, "Введіть групи, які повинні отримати повідомлення \nПриклад: 1, 2, 3")
+
+
+async def choose_group_(message: types.message, state: FSMContext):
+    async with state.proxy() as data:
+        data['groups'] = message.text
+
     await FSMFiles.next()
     await bot.send_message(message.chat.id, "Відправте файл")
 
@@ -81,7 +101,7 @@ async def file_send_date_(message : types.Message, state: FSMContext):
     for i in range(len(date_time_str)):
         unixtime = datetime.strptime(date_time_str[i], '%d-%m-%y %H:%M:%S')
         unixtime = time.mktime(unixtime.timetuple())
-        if i==0:
+        if i == 0:
             unixtime_ = str(unixtime)
         else:
             unixtime_ = unixtime_ + ', ' + str(unixtime)
@@ -93,14 +113,15 @@ async def file_send_date_(message : types.Message, state: FSMContext):
 
 
     async with state.proxy() as data:
-       sql = "INSERT INTO file_storage (file_name, description, file_id, file_type, subject) " \
-       + " VALUES (%s, %s, %s, %s, %s) "
+       sql = "INSERT INTO file_storage (file_name, description, file_id, file_type, subject, groups) " \
+       + " VALUES (%s, %s, %s, %s, %s, %s) "
        subject = data['subject']
+       groups = data['groups']
        file_type = data['type']
        file_id = data['file_id']
        name = data['name']
        description = data['description']
-       cursor.execute(sql, (name, description, file_id, file_type, subject))
+       cursor.execute(sql, (name, description, file_id, file_type, subject, groups))
        connection.commit()
 
 
@@ -129,9 +150,10 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     await message.reply('Ok', reply_markup=tch_keyboard)
 
 def register_handlers_files(dp : Dispatcher):
-    dp.register_message_handler(cm_start_, lambda message: message.text == "Додати додатковий матеріал", state=None)
+    dp.register_message_handler(cm_start_, lambda message: message.text == "Додати додатковий матеріал", state=UserRoles.teacher)
     dp.register_message_handler(mistake_disciplines_, lambda message: message.text not in list, state=FSMFiles.discipline_)
     dp.register_message_handler(choose_discipline_, state=FSMFiles.discipline_)
+    dp.register_message_handler(choose_group_, state=FSMFiles.group_)
     dp.register_message_handler(upload_file_,content_types = ['photo','video','audio','document','animation','video_note','voice'], state=FSMFiles.document_)
     dp.register_message_handler(file_name_,  state=FSMFiles.name_)
     dp.register_message_handler(file_description_, state=FSMFiles.description_)
