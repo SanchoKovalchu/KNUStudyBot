@@ -2,6 +2,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import  State, StatesGroup
 from keyboard.teacher_keyboard import tch_keyboard
+from keyboard.student_keyboard import st_keyboard
 from keyboard.discipline_keyboard import dsp_keyboard, list
 from aiogram import types, Dispatcher
 # import bot_key
@@ -9,6 +10,9 @@ from bot_create import cursor, bot, connection
 import json
 from datetime import datetime
 import time
+from handlers.login import UserRoles
+
+
 
 class FSMFiles(StatesGroup):
     discipline_ = State()
@@ -24,9 +28,14 @@ class FSMFiles(StatesGroup):
 
 
 async def cm_start_(message : types.Message):
-    await FSMFiles.discipline_.set()
-    await bot.send_message(message.chat.id, "Виберіть дисципліну, до якої хочете завантажити додатковий файл", reply_markup=dsp_keyboard)
-
+    # print(user_role.user_role_id)
+    # if not_enough_rights.user_role_checker(user_role.user_role_id, 2, 1):
+        await FSMFiles.discipline_.set()
+        await bot.send_message(message.chat.id, "Виберіть дисципліну, до якої хочете завантажити додатковий файл", reply_markup=dsp_keyboard)
+    # else:
+    #     if user_role.user_role_id == 1:
+    #
+    #         await bot.send_message(message.chat.id, "Ви не маєте достатньо прав!", reply_markup=st_keyboard)
 async def mistake_disciplines_(message: types.Message):
     return await message.reply("Помилка. Оберіть дисципліну з клавіатури")
 
@@ -141,7 +150,7 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     await message.reply('Ok', reply_markup=tch_keyboard)
 
 def register_handlers_files(dp : Dispatcher):
-    dp.register_message_handler(cm_start_, lambda message: message.text == "Додати додатковий матеріал", state=None)
+    dp.register_message_handler(cm_start_, lambda message: message.text == "Додати додатковий матеріал", state=UserRoles.teacher)
     dp.register_message_handler(mistake_disciplines_, lambda message: message.text not in list, state=FSMFiles.discipline_)
     dp.register_message_handler(choose_discipline_, state=FSMFiles.discipline_)
     dp.register_message_handler(choose_group_, state=FSMFiles.group_)

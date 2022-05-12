@@ -8,6 +8,8 @@ from handlers.teacher_material_dir.edit_material import cm_start_edit
 from handlers.teacher_material_dir.delete_material import cm_start_delete
 from aiogram.dispatcher.filters import Text
 
+from handlers.login import UserRoles
+
 class FSMViewFiles(StatesGroup):
     discipline = State()
     choose_file = State()
@@ -58,7 +60,7 @@ async def callbacks_command(call: types.CallbackQuery):
         await cm_start_delete(call.data,call.from_user.id)
 
 def register_handlers_files(dp : Dispatcher):
-    dp.register_message_handler(cm_start, lambda message: message.text == "Переглянути матеріал", state=None)
+    dp.register_message_handler(cm_start, lambda message: message.text == "Переглянути матеріал", state=UserRoles.teacher)
     dp.register_message_handler(mistake_discipline, lambda message: message.text not in list, state=FSMViewFiles.discipline)
     dp.register_message_handler(sql_read_file, state=FSMViewFiles.discipline)
     dp.register_callback_query_handler(callbacks_command, Text(endswith=['edit','delete']))

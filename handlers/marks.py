@@ -4,7 +4,7 @@ from bot_create import cursor, bot
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from aiogram import types, Dispatcher
 from keyboard.student_keyboard import st_keyboard
-
+from handlers.login import UserRoles
 subjects_list = []
 class Form(StatesGroup):
     subject = State()
@@ -73,5 +73,5 @@ async def view_marks(message : types.Message, state: FSMContext):
     await bot.send_message(message.chat.id, the_message, parse_mode='HTML', reply_markup=st_keyboard)
     await state.finish()
 def register_handlers_marks(dp : Dispatcher):
-    dp.register_message_handler(announcement_command, lambda message: message.text == "Оцінки")
+    dp.register_message_handler(announcement_command, lambda message: message.text == "Оцінки", state=UserRoles.student)
     dp.register_message_handler(view_marks, state=Form.subject)

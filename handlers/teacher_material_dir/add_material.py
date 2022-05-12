@@ -6,6 +6,8 @@ from keyboard.discipline_keyboard import dsp_keyboard, list
 from aiogram import types, Dispatcher
 from bot_create import cursor, bot, connection
 
+from handlers.login import UserRoles
+
 class FSMFiles(StatesGroup):
     discipline = State()
     document = State()
@@ -80,7 +82,7 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     await message.reply('Ok', reply_markup=tch_keyboard)
 
 def register_handlers_files(dp : Dispatcher):
-    dp.register_message_handler(cm_start, lambda message: message.text == "Додати матеріал", state=None)
+    dp.register_message_handler(cm_start, lambda message: message.text == "Додати матеріал", state=UserRoles.teacher)
     dp.register_message_handler(mistake_disciplines, lambda message: message.text not in list, state=FSMFiles.discipline)
     dp.register_message_handler(choose_discipline, state=FSMFiles.discipline)
     dp.register_message_handler(upload_file,content_types = ['photo','video','audio','document','animation','video_note','voice'], state=FSMFiles.document)

@@ -3,7 +3,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram import types, Dispatcher
 from bot_create import cursor
 from bot_create import bot
-
+from handlers.login import UserRoles
 class FormAnnounce(StatesGroup):
     receivers = State()
     course = State()
@@ -162,7 +162,7 @@ async def load_confirmation(message: types.Message, state: FSMContext):
         await message.answer("Оголошення надіслано успішно!", reply_markup=types.ReplyKeyboardRemove())
 
 def register_handlers_announcement(dp: Dispatcher):
-    dp.register_message_handler(announcement_command, lambda message: message.text == "Оголошення")
+    dp.register_message_handler(announcement_command, lambda message: message.text == "Оголошення", state=UserRoles.teacher)
     dp.register_message_handler(mistake_receivers, lambda message: message.text not in ["Курс", "Спеціальність", "Група", "Студент", "Викладач"], state=FormAnnounce.receivers)
     dp.register_message_handler(load_receivers, state=FormAnnounce.receivers)
     dp.register_message_handler(mistake_course,lambda message: message.text not in ["1", "2", "3", "4", "5", "6"],state=FormAnnounce.course)
