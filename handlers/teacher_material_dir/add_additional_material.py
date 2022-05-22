@@ -91,8 +91,9 @@ async def file_description_(message : types.Message, state: FSMContext):
         data['description'] = message.text
 
     await FSMFiles.next()
-    await message.reply("Введіть дату та час відправлення.\n Приклад: 18-09-20 01:55:19")
-
+    now = datetime.now()
+    dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
+    await message.reply("Введіть дату та час відправлення.\n Приклад: <code>" + dt_string + "</code>", parse_mode='HTML')
 
 async def file_send_date_(message : types.Message, state: FSMContext):
     date_time_str = [str(data_time_str) for data_time_str in message.text.split(', ')]

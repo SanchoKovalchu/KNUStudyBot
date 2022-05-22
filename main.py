@@ -8,42 +8,49 @@ from handlers import marks
 from handlers.register_dir import admin_register
 from handlers.register_dir import teacher_register
 from handlers.register_dir import student_register
-from handlers.teacher_material_dir import add_material
-from handlers.teacher_material_dir import add_additional_material
-from handlers.teacher_material_dir import announcement_add_material
+from handlers.teacher_material_dir import add_material as t_add
+from handlers.teacher_material_dir import add_additional_material as t_add_additional
+from handlers.teacher_material_dir import announcement_add_material as t_announcement_add
 from handlers.teacher_material_dir.announcement_add_material import send_message
-from handlers.teacher_material_dir import edit_material
-from handlers.teacher_material_dir import delete_material
-from handlers.teacher_material_dir import view_material
+from handlers.teacher_material_dir import edit_material as t_edit
+from handlers.teacher_material_dir import delete_material as t_delete
+from handlers.teacher_material_dir import view_material as t_view
+from handlers.student_material_dir import add_material as s_add
+from handlers.student_material_dir import edit_material as s_edit
+from handlers.student_material_dir import delete_material as s_delete
+from handlers.student_material_dir import view_material as s_view
 from bot_create import dp, connection, cursor, bot
 from keyboard import first_keyboard
-from user_role_files import teacher
-
-
-
-
+from user_role_files import teacher, student
 
 ###
 import aioschedule
 import asyncio
+
 ###
-add_material.register_handlers_files(dp)
-add_additional_material.register_handlers_files(dp)
-edit_material.register_handlers_files(dp)
-delete_material.register_handlers_files(dp)
-view_material.register_handlers_files(dp)
+# teacher material
+t_add.register_handlers_files(dp)
+t_add_additional.register_handlers_files(dp)
+t_edit.register_handlers_files(dp)
+t_delete.register_handlers_files(dp)
+t_view.register_handlers_files(dp)
+# student material
+s_add.register_handlers_files(dp)
+s_edit.register_handlers_files(dp)
+s_delete.register_handlers_files(dp)
+s_view.register_handlers_files(dp)
+# login and register
 login.register_handlers_login(dp)
 student_register.register_handlers_student_register(dp)
 teacher_register.register_handlers_teacher_register(dp)
 admin_register.register_handlers_admin_register(dp)
 teacher.register_handlers_teacher(dp)
+student.register_handlers_teacher(dp)
 announcement.register_handlers_announcement(dp)
 disciplines.register_handlers_disciplines(dp)
 tests.register_handlers_tests(dp)
 marks.register_handlers_marks(dp)
 logging.basicConfig(level=logging.INFO)
-
-
 
 
 @dp.message_handler(commands="start")
@@ -52,7 +59,6 @@ async def cmd_start(message: types.Message):
 
 
 async def scheduler():
-
     aioschedule.every(60).seconds.do(send_message)
     while True:
         await aioschedule.run_pending()
@@ -61,6 +67,7 @@ async def scheduler():
 
 async def on_startup(_):
     asyncio.create_task(scheduler())
+
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=False, on_startup=on_startup)
