@@ -2,12 +2,9 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import  State, StatesGroup
 from keyboard.teacher_keyboard import tch_keyboard
-from keyboard.student_keyboard import st_keyboard
 from keyboard.discipline_keyboard import dsp_keyboard, list
 from aiogram import types, Dispatcher
-# import bot_key
 from bot_create import cursor, bot, connection
-import json
 from datetime import datetime
 import time
 from handlers.login import UserRoles
@@ -92,10 +89,11 @@ async def file_description_(message : types.Message, state: FSMContext):
 
     await FSMFiles.next()
     now = datetime.now()
-    dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
+    dt_string = now.strftime("%d-%m-%y %H:%M:%S")
     await message.reply("Введіть дату та час відправлення.\n Приклад: <code>" + dt_string + "</code>", parse_mode='HTML')
 
-async def file_send_date_(message : types.Message, state: FSMContext):
+
+async def file_send_date_(message: types.Message, state: FSMContext):
     date_time_str = [str(data_time_str) for data_time_str in message.text.split(', ')]
     date_time_str.sort()
     unixtime_ = ""
@@ -130,7 +128,7 @@ async def file_send_date_(message : types.Message, state: FSMContext):
         sql = "INSERT INTO 	add_file_storage (file_id, date_time) " \
               + " VALUES (%s, %s) "
 
-        # Выполнить sql и передать 3 параметра.
+        # Выполнить sql и передать 2 параметра.
         file_id = data['file_id']
         date_time = data['date_time']
         cursor.execute(sql, (file_id, date_time))

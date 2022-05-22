@@ -84,7 +84,7 @@ async def teacher_load_cathedra(message: types.Message, state: FSMContext):
                          "Логін: " + user_login + "\n"
                          "Пароль: " + user_password + "\n"
                          "ПІБ: " + user_PIB + "\n"
-                         "Кафедра: " + user_sp + "\n",
+                         "Кафедра: " + cathedra + "\n",
                          reply_markup=first_keyboard)
 
 

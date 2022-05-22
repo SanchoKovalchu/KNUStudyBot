@@ -34,7 +34,7 @@ async def sql_read_file(message: types.message, state: FSMContext):
     sql = "SELECT * FROM file_storage WHERE subject = %s"
     cursor.execute(sql, message.text)
     for row in cursor.fetchall():
-        message_text = f'Назва: {row["file_name"]}\nОпис: {row["description"]}'
+        message_text = f'Назва: {row["file_name"]}\nОпис: {row["description"]}\nГрупи: {row["groups"]}'
         match row["file_type"]:
             case 'photo':
                 await bot.send_photo(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))

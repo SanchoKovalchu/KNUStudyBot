@@ -1,7 +1,5 @@
 import time
 from datetime import datetime
-
-
 from bot_create import connection, cursor, bot
 
 
