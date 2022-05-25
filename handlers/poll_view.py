@@ -21,14 +21,14 @@ async def view_polls(message: types.Message):
         chat_id.append(row["chat_id"])
         message_id.append(row["message_id"])
         date_time.append(row["datetime"])
-    n = 0
+    n = -1
     for i in range(len(chat_id)):
         await bot.forward_message(message.from_user.id, chat_id[i], message_id[i])
         n += 2
         if i == 0:
             await bot.send_message(message.from_user.id, "Дата опитування: " + date_time[i], reply_markup=tch_keyboard, reply_to_message_id=message.message_id+1)
         else:
-            await bot.send_message(message.from_user.id, "Дата опитування: " + date_time[i], reply_markup=tch_keyboard, reply_to_message_id=message.message_id+n-1)
+            await bot.send_message(message.from_user.id, "Дата опитування: " + date_time[i], reply_markup=tch_keyboard, reply_to_message_id=message.message_id+n)
 
     if len(chat_id) == 0:
         await bot.send_message(message.chat.id, "Опитування відсутні", reply_markup=tch_keyboard)
