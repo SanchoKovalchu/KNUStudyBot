@@ -4,6 +4,8 @@ from keyboard.teacher_keyboard import tch_keyboard
 from aiogram.dispatcher.filters import Text
 import asyncio
 
+from handlers.login import UserRoles
+
 buttons = [types.InlineKeyboardButton(text='Так', callback_data="True"),types.InlineKeyboardButton(text='Ні', callback_data="False")]
 bool = types.InlineKeyboardMarkup().add(*buttons)
 
@@ -33,4 +35,4 @@ async def delete_message(message: types.Message, sleep_time: int = 0):
     await message.delete()
 
 def register_handlers_files(dp : Dispatcher):
-    dp.register_callback_query_handler(callback_delete, Text(equals=["True","False"]))
+    dp.register_callback_query_handler(callback_delete, Text(equals=["True","False"]), state=UserRoles.teacher)

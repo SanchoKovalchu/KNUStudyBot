@@ -11,7 +11,7 @@ from handlers.login import UserRoles
 
 
 
-class FSMFiles(StatesGroup):
+class FSMAdditionalFiles(StatesGroup):
     discipline_ = State()
     group_ = State()
     document_ = State()
@@ -27,7 +27,7 @@ class FSMFiles(StatesGroup):
 async def cm_start_(message : types.Message):
     # print(user_role.user_role_id)
     # if not_enough_rights.user_role_checker(user_role.user_role_id, 2, 1):
-        await FSMFiles.discipline_.set()
+        await FSMAdditionalFiles.discipline_.set()
         await bot.send_message(message.chat.id, "Виберіть дисципліну, до якої хочете завантажити додатковий файл", reply_markup=dsp_keyboard)
     # else:
     #     if user_role.user_role_id == 1:
@@ -41,7 +41,7 @@ async def mistake_disciplines_(message: types.Message):
 async def choose_discipline_(message : types.message, state: FSMContext):
     async with state.proxy() as data:
         data['subject'] = message.text
-    await FSMFiles.next()
+    await FSMAdditionalFiles.next()
     await bot.send_message(message.chat.id, "Введіть групи, які повинні отримати повідомлення \nПриклад: 1, 2, 3")
 
 
@@ -49,7 +49,7 @@ async def choose_group_(message: types.message, state: FSMContext):
     async with state.proxy() as data:
         data['groups'] = message.text
 
-    await FSMFiles.next()
+    await FSMAdditionalFiles.next()
     await bot.send_message(message.chat.id, "Відправте файл")
 
 
@@ -70,7 +70,7 @@ async def upload_file_(message : types.Message, state: FSMContext):
             data['file_id'] = message.video_note.file_id
         else:
             data['file_id'] = message.document.file_id
-    await FSMFiles.next()
+    await FSMAdditionalFiles.next()
     await message.reply("Яка назва файлу?")
 
 
@@ -79,7 +79,7 @@ async def file_name_(message : types.Message, state: FSMContext):
         data['name'] = message.text
 
 
-    await FSMFiles.next()
+    await FSMAdditionalFiles.next()
     await message.reply("Опишіть вміст файлу")
 
 
@@ -87,7 +87,7 @@ async def file_description_(message : types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['description'] = message.text
 
-    await FSMFiles.next()
+    await FSMAdditionalFiles.next()
     now = datetime.now()
     dt_string = now.strftime("%d-%m-%y %H:%M:%S")
     await message.reply("Введіть дату та час відправлення.\n Приклад: <code>" + dt_string + "</code>", parse_mode='HTML')
@@ -150,12 +150,12 @@ async def cancel_handler(message: types.Message, state: FSMContext):
 
 def register_handlers_files(dp : Dispatcher):
     dp.register_message_handler(cm_start_, lambda message: message.text == "Додати додатковий матеріал", state=UserRoles.teacher)
-    dp.register_message_handler(mistake_disciplines_, lambda message: message.text not in list, state=FSMFiles.discipline_)
-    dp.register_message_handler(choose_discipline_, state=FSMFiles.discipline_)
-    dp.register_message_handler(choose_group_, state=FSMFiles.group_)
-    dp.register_message_handler(upload_file_,content_types = ['photo','video','audio','document','animation','video_note','voice'], state=FSMFiles.document_)
-    dp.register_message_handler(file_name_,  state=FSMFiles.name_)
-    dp.register_message_handler(file_description_, state=FSMFiles.description_)
-    dp.register_message_handler(file_send_date_, state=FSMFiles.send_date_)
+    dp.register_message_handler(mistake_disciplines_, lambda message: message.text not in list, state=FSMAdditionalFiles.discipline_)
+    dp.register_message_handler(choose_discipline_, state=FSMAdditionalFiles.discipline_)
+    dp.register_message_handler(choose_group_, state=FSMAdditionalFiles.group_)
+    dp.register_message_handler(upload_file_,content_types = ['photo','video','audio','document','animation','video_note','voice'], state=FSMAdditionalFiles.document_)
+    dp.register_message_handler(file_name_,  state=FSMAdditionalFiles.name_)
+    dp.register_message_handler(file_description_, state=FSMAdditionalFiles.description_)
+    dp.register_message_handler(file_send_date_, state=FSMAdditionalFiles.send_date_)
     dp.register_message_handler(cancel_handler, state="*",commands='stop')
     dp.register_message_handler(cancel_handler, Text(equals='stop', ignore_case=True), state="*")

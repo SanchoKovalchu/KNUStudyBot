@@ -10,7 +10,7 @@ from handlers.login import UserRoles
 
 class FSMFiles(StatesGroup):
     discipline = State()
-    group_ = State()
+    group = State()
     document = State()
     name = State()
     description = State()
@@ -26,9 +26,9 @@ async def choose_discipline(message : types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['subject'] = message.text
     await FSMFiles.next()
-    await bot.send_message(message.chat.id, "Введіть групи, які повинні отримати повідомлення \nПриклад: 1, 2, 3")
+    await bot.send_message(message.chat.id, "Введіть групи, які повинні отримати доступ до файлів \nПриклад: 1, 2, 3")
 
-async def choose_group_(message: types.message, state: FSMContext):
+async def choose_group(message: types.message, state: FSMContext):
     async with state.proxy() as data:
         data['groups'] = message.text
 
@@ -96,7 +96,7 @@ def register_handlers_files(dp : Dispatcher):
     dp.register_message_handler(cm_start, lambda message: message.text == "Додати матеріал", state=UserRoles.teacher)
     dp.register_message_handler(mistake_disciplines, lambda message: message.text not in list, state=FSMFiles.discipline)
     dp.register_message_handler(choose_discipline, state=FSMFiles.discipline)
-    dp.register_message_handler(choose_group_, state=FSMFiles.group_)
+    dp.register_message_handler(choose_group, state=FSMFiles.group)
     dp.register_message_handler(upload_file,content_types = ['photo','video','audio','document','animation','video_note','voice'], state=FSMFiles.document)
     dp.register_message_handler(file_name,  state=FSMFiles.name)
     dp.register_message_handler(file_description, state=FSMFiles.description)
