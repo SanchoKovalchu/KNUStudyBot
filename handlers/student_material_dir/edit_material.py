@@ -78,7 +78,7 @@ async def update_database(state: FSMContext):
     global id
     global chat
     async with state.proxy() as data:
-        update_statement = "UPDATE file_storage set file_name = %s, description = %s, subject = %s WHERE id = %s"
+        update_statement = "UPDATE file_storage_student set file_name = %s, description = %s, subject = %s WHERE id = %s"
         cursor.execute(update_statement, (data['name'], data['description'], data['subject'], id))
         connection.commit()
     await state.finish()
