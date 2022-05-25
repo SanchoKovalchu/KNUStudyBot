@@ -62,7 +62,7 @@ async def load_password(message: types.Message, state: FSMContext):
                 cursor.execute(sql, user_id)
                 for row in cursor:
                     PIB = row["PIB"]
-                    cathedra = row["cathedra"]
+                    cathedra = row["speciality"]
                 await message.answer(
                     "Вітаємо!\nВаші дані:\nПІБ: " + PIB + "\nКафедра: " + str(cathedra), reply_markup=tch_keyboard)
             else:
