@@ -55,6 +55,7 @@ async def sql_read_file(message: types.message, state: FSMContext):
 
 async def callbacks_command(call: types.CallbackQuery):
     command = call.data.split(sep="_")[1]
+    print("Hello")
     if command == "edit":
         await cm_start_edit(call.data, call.from_user.id)
     else:

@@ -6,6 +6,8 @@ from keyboard.discipline_keyboard import dsp_keyboard, list
 from keyboard.teacher_keyboard import tch_keyboard
 from keyboard.file_keyboard import fl_keyboard
 
+from handlers.login import UserRoles
+
 class FSMEditFiles(StatesGroup):
     edit_file_info = State()
     change_name = State()
@@ -82,6 +84,7 @@ async def update_database(state: FSMContext):
         cursor.execute(update_statement, (data['name'], data['description'], data['subject'], id))
         connection.commit()
     await state.finish()
+    await UserRoles.teacher.set()
     await bot.send_message(chat, "Зміни внесено до БД!", reply_markup=tch_keyboard)
 
 
@@ -90,6 +93,7 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     if current_state is None:
         return
     await state.finish()
+    await UserRoles.teacher.set()
     await message.reply('Ok', reply_markup=tch_keyboard)
 
 def register_handlers_files(dp : Dispatcher):
