@@ -15,7 +15,7 @@ class FormAnnounce(StatesGroup):
     sp = State()
     group = State()
     person = State()
-    cathedra = State()
+    speciality = State()
     text = State()
     havefile = State()
     file = State()
@@ -56,7 +56,7 @@ async def load_receivers2(message: types.Message, state: FSMContext):
         await FormAnnounce.person.set()
         await message.reply("Введіть ПІБ викладача:")
     elif user_receivers == 'Усі викладачі кафедри':
-        await FormAnnounce.cathedra.set()
+        await FormAnnounce.speciality.set()
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
         markup.add("IPZ", "PP", "AND", "KN")
         await message.reply("Яка кафедра?", reply_markup=markup)
@@ -69,12 +69,12 @@ async def load_receivers2(message: types.Message, state: FSMContext):
         markup.add("1", "2", "3", "4", "5", "6")
         await message.reply("Який курс?", reply_markup=markup)
 
-async def mistake_cathedra(message: types.Message):
+async def mistake_speciality(message: types.Message):
     return await message.reply("Помилка. Оберіть курс із клавіатури")
 
-async def load_cathedra(message: types.Message, state: FSMContext):
+async def load_speciality(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
-        data['cathedra'] = message.text
+        data['speciality'] = message.text
     await FormAnnounce.havefile.set()
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.add("Так", "Ні")
@@ -191,7 +191,7 @@ async def load_content(message: types.Message, state: FSMContext):
         if user_receivers == 'Студент' or user_receivers == 'Один викладач':
             user_PIB = data['PIB']
         if user_receivers == 'Усі викладачі кафедри':
-            user_cathedra = data['cathedra']
+            user_speciality = data['speciality']
         if user_havefile == 'Так':
             user_file_type = data['type']
             user_file_id = data['file_id']
@@ -207,7 +207,7 @@ async def load_content(message: types.Message, state: FSMContext):
     elif user_receivers == 'Один викладач':
         await message.answer("Таке повідомлення буде надіслано викладачу, ПІБ якого " + user_PIB + ":")
     elif user_receivers == 'Усі викладачі кафедри':
-        await message.answer("Таке повідомлення буде надіслано викладачам кафедри " + user_cathedra + ":")
+        await message.answer("Таке повідомлення буде надіслано викладачам кафедри " + user_speciality + ":")
     if user_havefile == 'Ні':
         await message.answer(user_text)
     else:
@@ -253,7 +253,7 @@ async def load_confirmation(message: types.Message, state: FSMContext):
             if user_receivers == 'Студент' or user_receivers == 'Один викладач':
                 user_PIB = data['PIB']
             if user_receivers == 'Усі викладачі кафедри':
-                user_cathedra = data['cathedra']
+                user_speciality = data['speciality']
             if user_havefile == 'Так':
                 user_file_type = data['type']
                 user_file_id = data['file_id']
@@ -281,8 +281,8 @@ async def load_confirmation(message: types.Message, state: FSMContext):
             cursor.execute(sql, user_PIB)
             rec = cursor.fetchall()
         else :
-            sql = "SELECT * FROM teacher_data WHERE cathedra = %s"
-            cursor.execute(sql, user_cathedra)
+            sql = "SELECT * FROM teacher_data WHERE speciality = %s"
+            cursor.execute(sql, user_speciality)
             rec = cursor.fetchall()
         for row in rec:
             if user_havefile == 'Ні':
@@ -311,8 +311,8 @@ def register_handlers_announcement(dp: Dispatcher):
     dp.register_message_handler(mistake_receivers2, lambda message: message.text not in ["Курс", "Спеціальність", "Група", "Студент","Усі викладачі кафедри", "Один викладач"], state=FormAnnounce.receivers2)
     dp.register_message_handler(load_receivers1, state=FormAnnounce.receivers1)
     dp.register_message_handler(load_receivers2, state=FormAnnounce.receivers2)
-    dp.register_message_handler(mistake_cathedra, lambda message: message.text not in ["IPZ", "PP", "AND", "KN"],state=FormAnnounce.cathedra)
-    dp.register_message_handler(load_cathedra, state=FormAnnounce.cathedra)
+    dp.register_message_handler(mistake_speciality, lambda message: message.text not in ["IPZ", "PP", "AND", "KN"],state=FormAnnounce.speciality)
+    dp.register_message_handler(load_speciality, state=FormAnnounce.speciality)
     dp.register_message_handler(mistake_course,lambda message: message.text not in ["1", "2", "3", "4", "5", "6"],state=FormAnnounce.course)
     dp.register_message_handler(load_course, state=FormAnnounce.course)
     dp.register_message_handler(mistake_sp, lambda message: message.text not in ["IPZ", "PP", "AND", "KN"],state=FormAnnounce.sp)
