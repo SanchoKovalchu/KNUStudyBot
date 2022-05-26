@@ -5,6 +5,7 @@ from handlers import choose_announcement
 from handlers import choose_poll
 from handlers import poll_announcement
 from handlers import poll_view
+from handlers import poll_delete
 from handlers import announcement
 from handlers import disciplines
 from handlers import tests

@@ -6,6 +6,7 @@ from handlers import poll_announcement
 from handlers import choose_announcement
 from handlers import choose_poll
 from handlers import poll_view
+from handlers import poll_delete
 from handlers import disciplines
 from handlers import tests
 from handlers import marks
@@ -52,6 +53,7 @@ teacher.register_handlers_teacher(dp)
 student.register_handlers_teacher(dp)
 announcement.register_handlers_announcement(dp)
 poll_announcement.register_handlers_poll_announcement(dp)
+poll_delete.register_handlers_files(dp)
 choose_announcement.register_handlers_choose_announcement(dp)
 choose_poll.register_handlers_choose_poll(dp)
 poll_view.register_handlers_poll_view(dp)
