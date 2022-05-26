@@ -1,7 +1,4 @@
-from aiogram.dispatcher.filters.state import State, StatesGroup
-from aiogram.dispatcher import FSMContext
 from aiogram import types, Dispatcher
-from bot_create import cursor
 from bot_create import bot
 from handlers.login import UserRoles
 from keyboard import ab_keyboard

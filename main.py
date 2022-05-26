@@ -1,29 +1,41 @@
 import logging
 from aiogram import executor, types
 from handlers import login
+
 from handlers import announcement
+
+from handlers import choose_poll
+from handlers import poll_view
 from handlers import poll_announcement
 from handlers import choose_announcement
+from handlers import poll_delete
+
 from handlers import disciplines
 from handlers import tests
-from handlers import marks
+from handlers import marks, add_marks as t_marks
+
 from handlers.register_dir import admin_register
 from handlers.register_dir import teacher_register
 from handlers.register_dir import student_register
+
 from handlers.teacher_material_dir import add_material as t_add
 from handlers.teacher_material_dir import add_additional_material as t_add_additional
 from handlers.teacher_material_dir.announcement_add_material import send_message
 from handlers.teacher_material_dir import edit_material as t_edit
 from handlers.teacher_material_dir import delete_material as t_delete
 from handlers.teacher_material_dir import view_material as t_view
+
 from handlers.teacher_task_dir import view_task as t_view_task, add_task as t_add_task, delete_task as t_delete_task, edit_task as t_edit_task
+
 from handlers.student_material_dir import add_material as s_add
 from handlers.student_material_dir import edit_material as s_edit
 from handlers.student_material_dir import delete_material as s_delete
 from handlers.student_material_dir import view_material as s_view
+
 from bot_create import dp
 from keyboard import first_keyboard
 from user_role_files import teacher, student
+
 
 ###
 import aioschedule
@@ -55,12 +67,21 @@ teacher_register.register_handlers_teacher_register(dp)
 admin_register.register_handlers_admin_register(dp)
 teacher.register_handlers_teacher(dp)
 student.register_handlers_teacher(dp)
+
 announcement.register_handlers_announcement(dp)
 poll_announcement.register_handlers_poll_announcement(dp)
 choose_announcement.register_handlers_choose_announcement(dp)
+choose_poll.register_handlers_choose_poll(dp)
+poll_view.register_handlers_poll_view(dp)
+poll_delete.register_handlers_files(dp)
+
 disciplines.register_handlers_disciplines(dp)
 tests.register_handlers_tests(dp)
 marks.register_handlers_marks(dp)
+t_marks.register_handlers_marks(dp)
+
+
+
 logging.basicConfig(level=logging.INFO)
 
 
