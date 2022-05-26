@@ -12,16 +12,16 @@ from handlers.register_dir import teacher_register
 from handlers.register_dir import student_register
 from handlers.teacher_material_dir import add_material as t_add
 from handlers.teacher_material_dir import add_additional_material as t_add_additional
-from handlers.teacher_material_dir import announcement_add_material as t_announcement_add
 from handlers.teacher_material_dir.announcement_add_material import send_message
 from handlers.teacher_material_dir import edit_material as t_edit
 from handlers.teacher_material_dir import delete_material as t_delete
 from handlers.teacher_material_dir import view_material as t_view
+from handlers.teacher_task_dir import view_task as t_view_task, add_task as t_add_task, delete_task as t_delete_task, edit_task as t_edit_task
 from handlers.student_material_dir import add_material as s_add
 from handlers.student_material_dir import edit_material as s_edit
 from handlers.student_material_dir import delete_material as s_delete
 from handlers.student_material_dir import view_material as s_view
-from bot_create import dp, connection, cursor, bot
+from bot_create import dp
 from keyboard import first_keyboard
 from user_role_files import teacher, student
 
@@ -36,6 +36,13 @@ t_add_additional.register_handlers_files(dp)
 t_edit.register_handlers_files(dp)
 t_delete.register_handlers_files(dp)
 t_view.register_handlers_files(dp)
+# teacher tasks
+t_add_task.register_handlers_tasks(dp)
+t_view_task.register_handlers_tasks(dp)
+t_delete_task.register_handlers_tasks(dp)
+t_edit_task.register_handlers_tasks(dp)
+#student tasks
+
 # student material
 s_add.register_handlers_files(dp)
 s_edit.register_handlers_files(dp)
@@ -71,7 +78,6 @@ async def scheduler():
 
 async def on_startup(_):
     asyncio.create_task(scheduler())
-
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=False, on_startup=on_startup)

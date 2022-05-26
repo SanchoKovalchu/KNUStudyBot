@@ -2,7 +2,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from bot_create import cursor, bot
 from aiogram import types, Dispatcher
-from keyboard.discipline_keyboard import dsp_keyboard, list
+from keyboard.discipline_keyboard import dsp_keyboard, disciplines
 from keyboard.teacher_keyboard import tch_keyboard
 from handlers.teacher_material_dir.edit_material import cm_start_edit
 from handlers.teacher_material_dir.delete_material import cm_start_delete
@@ -58,10 +58,10 @@ async def callbacks_command(call: types.CallbackQuery):
     if command == "edit":
         await cm_start_edit(call.data, call.from_user.id)
     else:
-        await cm_start_delete(call.data,call.from_user.id)
+        await cm_start_delete(call.data, call.from_user.id)
 
 def register_handlers_files(dp : Dispatcher):
     dp.register_message_handler(cm_start, lambda message: message.text == "Переглянути матеріал", state=UserRoles.teacher)
-    dp.register_message_handler(mistake_discipline, lambda message: message.text not in list, state=FSMViewFiles.discipline)
+    dp.register_message_handler(mistake_discipline, lambda message: message.text not in disciplines, state=FSMViewFiles.discipline)
     dp.register_message_handler(sql_read_file, state=FSMViewFiles.discipline)
     dp.register_callback_query_handler(callbacks_command, Text(endswith=['edit','delete']), state=UserRoles.teacher)

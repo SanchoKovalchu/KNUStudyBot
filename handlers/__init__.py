@@ -1,5 +1,7 @@
 from handlers import login
-from handlers.teacher_material_dir import announcement_add_material, add_material, add_additional_material, delete_material, view_material, edit_material
+from handlers.teacher_material_dir import announcement_add_material, add_material, add_additional_material, \
+    delete_material, view_material, edit_material
+from handlers.teacher_task_dir import view_task, add_task, delete_task, edit_task
 from handlers.student_material_dir import add_material, delete_material, view_material, edit_material
 from handlers import choose_announcement
 from handlers import poll_announcement

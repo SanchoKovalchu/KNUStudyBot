@@ -2,7 +2,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from bot_create import cursor, bot, connection
 from aiogram import types, Dispatcher
-from keyboard.discipline_keyboard import dsp_keyboard, list
+from keyboard.discipline_keyboard import dsp_keyboard, disciplines
 from keyboard.student_keyboard import st_keyboard
 from keyboard.file_keyboard import fl_keyboard
 
@@ -101,7 +101,7 @@ def register_handlers_files(dp : Dispatcher):
     dp.register_message_handler(update_variables, state=FSMEditFilesStudent.edit_file_info)
     dp.register_message_handler(update_name, state=FSMEditFilesStudent.change_name)
     dp.register_message_handler(update_description, state=FSMEditFilesStudent.change_description)
-    dp.register_message_handler(mistake_subject, lambda message: message.text not in list, state=FSMEditFilesStudent.change_subject)
+    dp.register_message_handler(mistake_subject, lambda message: message.text not in disciplines, state=FSMEditFilesStudent.change_subject)
     dp.register_message_handler(update_subject, state=FSMEditFilesStudent.change_subject)
     dp.register_message_handler(cancel_handler, state="*", commands='stop')
     dp.register_message_handler(cancel_handler, lambda message: message.text == 'stop', state="*")

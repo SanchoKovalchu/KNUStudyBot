@@ -72,6 +72,7 @@ async def view_marks(message : types.Message, state: FSMContext):
         the_message += f'Оцінка в сумі: <b>{summary_mark}</b>\n'
     await bot.send_message(message.chat.id, the_message, parse_mode='HTML', reply_markup=st_keyboard)
     await state.finish()
+
 def register_handlers_marks(dp : Dispatcher):
     dp.register_message_handler(announcement_command, lambda message: message.text == "Оцінки", state=UserRoles.student)
     dp.register_message_handler(view_marks, state=Form.subject)

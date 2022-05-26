@@ -2,7 +2,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import  State, StatesGroup
 from keyboard.student_keyboard import st_keyboard
-from keyboard.discipline_keyboard import dsp_keyboard, list
+from keyboard.discipline_keyboard import dsp_keyboard, disciplines
 from aiogram import types, Dispatcher
 from bot_create import cursor, bot, connection
 
@@ -84,7 +84,7 @@ async def cancel_handler(message: types.Message, state: FSMContext):
 
 def register_handlers_files(dp : Dispatcher):
     dp.register_message_handler(cm_start, lambda message: message.text == "Додати матеріал", state=UserRoles.student)
-    dp.register_message_handler(mistake_disciplines, lambda message: message.text not in list, state=FSMFilesStudent.discipline)
+    dp.register_message_handler(mistake_disciplines, lambda message: message.text not in disciplines, state=FSMFilesStudent.discipline)
     dp.register_message_handler(choose_discipline, state=FSMFilesStudent.discipline)
     dp.register_message_handler(upload_file,content_types = ['photo','video','audio','document','animation','video_note','voice'], state=FSMFilesStudent.document)
     dp.register_message_handler(file_name,  state=FSMFilesStudent.name)
