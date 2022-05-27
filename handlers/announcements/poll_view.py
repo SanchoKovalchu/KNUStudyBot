@@ -1,11 +1,9 @@
-from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 from aiogram import types, Dispatcher
 from handlers.login import UserRoles
 from keyboard.teacher_keyboard import tch_keyboard
-from aiogram.dispatcher.filters import Text
-from bot_create import connection, cursor, bot
-from handlers.poll_delete import cm_start_delete_poll
+from bot_create import cursor, bot
+from handlers.announcements.poll_delete import cm_start_delete_poll
 from aiogram.dispatcher.filters import Text
 
 msg1 = ""

@@ -2,16 +2,12 @@ import logging
 from aiogram import executor, types
 from handlers import login
 
-from handlers import announcement
-
-from handlers import choose_poll
-from handlers import poll_view
-from handlers import poll_announcement
-from handlers import choose_announcement
-from handlers import poll_delete
+from handlers.announcements import announcement, choose_poll, poll_announcement, poll_view, poll_delete, \
+    choose_announcement
 
 from handlers import disciplines
-from handlers import marks, add_marks as t_marks
+from handlers.marks import marks
+from handlers.marks import add_marks as t_marks
 
 from handlers.register_dir import admin_register
 from handlers.register_dir import teacher_register
@@ -35,8 +31,7 @@ from bot_create import dp
 from keyboard import first_keyboard
 from user_role_files import teacher, student
 
-from handlers.tests import tests, CorrectAnswer, AddTest, AddQuestions, PointsForQuestions, test_json_decoder
-
+from handlers.tests import tests, CorrectAnswer, AddTest, AddQuestions
 
 ###
 import aioschedule
