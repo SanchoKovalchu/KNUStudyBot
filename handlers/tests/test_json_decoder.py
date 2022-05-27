@@ -1,6 +1,6 @@
 import json
 from bot_create import cursor
-from handlers import tests
+from handlers.tests import tests
 
 user_data = {}
 user_task = {}

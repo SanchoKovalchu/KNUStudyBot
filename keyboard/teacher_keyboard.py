@@ -6,7 +6,7 @@ announcement_bt = KeyboardButton('Оголошення')
 material_bt = KeyboardButton('Матеріал')
 tasks_bt = KeyboardButton("Завдання")
 marks_bt = KeyboardButton('Додати оцінку')
-tests_bt = KeyboardButton('Тести')
+tests_bt = KeyboardButton('Створити тест')
 settings_bt = KeyboardButton('Налаштування')
 
 

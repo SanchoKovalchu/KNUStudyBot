@@ -1,6 +1,6 @@
 from aiogram.dispatcher.filters import Text
 from aiogram import types, Dispatcher
-from handlers import AddQuestions, PointsForQuestions
+from handlers.tests import AddQuestions, PointsForQuestions
 from handlers.login import UserRoles
 from aiogram.dispatcher.filters.state import State, StatesGroup
 

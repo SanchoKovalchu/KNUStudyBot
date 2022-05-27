@@ -11,7 +11,6 @@ from handlers import choose_announcement
 from handlers import poll_delete
 
 from handlers import disciplines
-from handlers import tests
 from handlers import marks, add_marks as t_marks
 
 from handlers.register_dir import admin_register
@@ -35,6 +34,8 @@ from handlers.student_material_dir import view_material as s_view
 from bot_create import dp
 from keyboard import first_keyboard
 from user_role_files import teacher, student
+
+from handlers.tests import tests, CorrectAnswer, AddTest, AddQuestions, PointsForQuestions, test_json_decoder
 
 
 ###
@@ -76,9 +77,13 @@ poll_view.register_handlers_poll_view(dp)
 poll_delete.register_handlers_files(dp)
 
 disciplines.register_handlers_disciplines(dp)
-tests.register_handlers_tests(dp)
 marks.register_handlers_marks(dp)
 t_marks.register_handlers_marks(dp)
+
+tests.register_handlers_tests(dp)
+CorrectAnswer.register_handlers_correctanswer(dp)
+AddTest.register_handlers_addtest(dp)
+AddQuestions.register_handlers_correct(dp)
 
 
 

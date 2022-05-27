@@ -1,6 +1,6 @@
 from aiogram import types
-from handlers import CorrectAnswer, AddQuestions
-from handlers import AddTest
+from handlers.tests import CorrectAnswer, AddQuestions, AddTest
+from handlers.login import UserRoles
 
 alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
@@ -47,6 +47,7 @@ async def update_num_value(message: types.Message):
         print(ThisClass.answerstring)
         AddQuestions.InputTest.Points = 0
         await message.edit_text("Тест створено успішно!")
+        await UserRoles.teacher.set()
     else:
         ThisClass.user_tasknumber = ThisClass.user_tasknumber + 1
         stringofans = ""

@@ -1,7 +1,5 @@
-from aiogram.dispatcher.filters import Text
 from aiogram import types, Dispatcher
-from handlers import AddQuestions, PointsForQuestions
-from handlers import AddTest
+from handlers.tests import AddQuestions, PointsForQuestions, AddTest
 
 user_data = {}
 question = []

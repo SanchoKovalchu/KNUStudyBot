@@ -8,10 +8,10 @@ from handlers import choose_announcement
 from handlers import announcement
 
 from handlers import disciplines
-from handlers import tests
 from handlers import marks
 from handlers.register_dir import teacher_register, student_register, admin_register
-from handlers.tests import test_json_decoder
+
+from handlers.tests import AddQuestions, AddTest, CorrectAnswer, PointsForQuestions, tests, test_json_decoder
 
 from handlers import poll_delete
 from handlers import poll_view

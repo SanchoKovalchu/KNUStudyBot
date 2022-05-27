@@ -1,8 +1,7 @@
 from aiogram.dispatcher.filters import Text
 from aiogram import types, Dispatcher
-from handlers import CorrectAnswer, PointsForQuestions
+from handlers.tests import CorrectAnswer, PointsForQuestions, AddTest
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from handlers import AddTest
 
 class InputTest:
     question = []

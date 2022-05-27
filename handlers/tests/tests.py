@@ -1,6 +1,5 @@
-from aiogram.dispatcher.filters import Text
 from aiogram import types, Dispatcher
-from handlers import test_json_decoder
+from handlers.tests import test_json_decoder
 from handlers.login import UserRoles
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
@@ -150,12 +149,14 @@ async def callbacks_num(call: types.CallbackQuery):
                 user_value = user_value + question_value[i]
         await TestingInp.nottesting.set()
         await call.message.edit_text(f"Сума балів: {user_value}")
+        await UserRoles.student.set()
     else:
         stringstr = user_savedans
         stringstr = stringstr[:ThisClass.user_tasknumber] + str(action) + stringstr[ThisClass.user_tasknumber + 1:]
         user_answersave[call.from_user.id] = stringstr
         await update_num_text(call.message, stringstr)
     await call.answer()
+
 
 def register_handlers_tests(dp: Dispatcher):
     dp.register_message_handler(cmd_numbers, lambda message: message.text == "Тестування", state=UserRoles.student)
