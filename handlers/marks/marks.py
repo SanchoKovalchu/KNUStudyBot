@@ -5,7 +5,7 @@ from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext
 from bot_create import cursor, bot, connection
 from handlers.login import UserRoles
-from keyboard.teacher_keyboard import tch_keyboard
+from keyboard.student_keyboard import st_keyboard
 
 # item to check
 check = []
@@ -77,17 +77,20 @@ async def load_subject(message: types.Message, state: FSMContext):
         messages += f"<b>{data['subject']}</b>\n\n"
 
         # outputting information
+        summary_mark = 0
         for item in marks_list:
             if item["Subject"] == data['subject']:
                 messages += f'<b>{index}. {item["Comment"]}</b> \n      Оцінка за роботу : <b>{item["Mark"]}</b>\n      ' \
                             f'Вчитель, який виставив оцінку : <b>@{item["Teacher"]}</b>\n' \
                             f'      Дата виставлення : <b>{item["Date"]}</b>\n\n'
+                summary_mark += float(item["Mark"])
                 index = index + 1
+        messages += f"<b>Сумарна оцінка за даний предмет : {summary_mark}</b>"
         await bot.send_message(message.chat.id, messages, parse_mode='HTML')
 
     # returning to menu
     await message.answer("<b>Повертаюсь до меню...</b>", parse_mode='HTML',
-                         reply_markup=tch_keyboard)
+                         reply_markup=st_keyboard)
     await state.finish()
     await UserRoles.student.set()
 

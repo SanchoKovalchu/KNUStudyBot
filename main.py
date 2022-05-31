@@ -8,6 +8,8 @@ from handlers.announcements import announcement, choose_poll, poll_announcement,
 from handlers import disciplines
 from handlers.marks import marks
 from handlers.marks import add_marks as t_marks
+from handlers.marks import edit_marks
+from handlers.marks import watch_marks
 
 from handlers.register_dir import admin_register
 from handlers.register_dir import teacher_register
@@ -74,6 +76,8 @@ poll_delete.register_handlers_files(dp)
 disciplines.register_handlers_disciplines(dp)
 marks.register_handlers_marks(dp)
 t_marks.register_handlers_marks(dp)
+edit_marks.register_handlers_marks(dp)
+watch_marks.register_handlers_marks(dp)
 
 tests.register_handlers_tests(dp)
 CorrectAnswer.register_handlers_correctanswer(dp)
