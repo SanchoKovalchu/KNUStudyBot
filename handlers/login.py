@@ -19,7 +19,7 @@ class FormLogin(StatesGroup):
 async def login_command(message: types.Message):
     # Set state
     await FormLogin.login.set()
-    await message.reply("Твій логін?")
+    await message.reply("Ваш логін?")
 
 
 async def load_login(message: types.Message, state: FSMContext):
@@ -27,7 +27,7 @@ async def load_login(message: types.Message, state: FSMContext):
         data['login'] = message.text
 
     await FormLogin.next()
-    await message.reply("Твій пароль?")
+    await message.reply("Ваш пароль?")
 
 
 async def load_password(message: types.Message, state: FSMContext):
@@ -62,9 +62,9 @@ async def load_password(message: types.Message, state: FSMContext):
                 cursor.execute(sql, user_id)
                 for row in cursor:
                     PIB = row["PIB"]
-                    cathedra = row["speciality"]
+                    speciality = row["speciality"]
                 await message.answer(
-                    "Вітаємо!\nВаші дані:\nПІБ: " + PIB + "\nКафедра: " + str(cathedra), reply_markup=tch_keyboard)
+                    "Вітаємо!\nВаші дані:\nПІБ: " + PIB + "\nСпеціальність: " + str(speciality), reply_markup=tch_keyboard)
             else:
                 sql = "SELECT * FROM admin_data WHERE user_id = %s"
                 cursor.execute(sql, user_id)

@@ -35,4 +35,4 @@ async def delete_message(message: types.Message, sleep_time: int = 0):
     await message.delete()
 
 def register_handlers_files(dp : Dispatcher):
-    dp.register_callback_query_handler(callback_delete, Text(equals=["True","False"]), state=UserRoles.teacher)
+    dp.register_callback_query_handler(callback_delete, Text(equals=["True", "False"]), state=UserRoles.teacher)
