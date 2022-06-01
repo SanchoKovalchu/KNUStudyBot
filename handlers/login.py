@@ -6,6 +6,7 @@ from keyboard import st_keyboard
 from keyboard import tch_keyboard
 
 
+
 class UserRoles(StatesGroup):
     student = State()
     teacher = State()
@@ -18,6 +19,7 @@ class FormLogin(StatesGroup):
 
 async def login_command(message: types.Message):
     # Set state
+
     await FormLogin.login.set()
     await message.reply("Ваш логін?")
 
@@ -38,43 +40,49 @@ async def load_password(message: types.Message, state: FSMContext):
         await state.finish()
         sql = "SELECT * FROM signIn_data WHERE user_login = %s"
         cursor.execute(sql, login)
-        #
-        for row in cursor:
-            user_password = row["user_password"]
-            user_id = row["user_id"]
-            user_role = row["user_role"]
-        if user_password == password:
-            # await message.answer("Ви успішно ввійшли")
-            if user_role == 1:
-                await UserRoles.student.set()
-                sql = "SELECT * FROM student_data WHERE user_id = %s"
-                cursor.execute(sql, user_id)
-                for row in cursor:
-                    PIB = row["PIB"]
-                    sp = row["sp"]
-                    course = row["course"]
-                    group = row["st_group"]
-                await message.answer("Вітаємо!\nВаші дані:\nПІБ: "+PIB+"\nНавчальна програма: " + sp + "\n"
-                                    "Курс: "+str(course)+"\nГрупа: "+str(group), reply_markup=st_keyboard)
-            elif user_role == 2:
-                await UserRoles.teacher.set()
-                sql = "SELECT * FROM teacher_data WHERE user_id = %s"
-                cursor.execute(sql, user_id)
-                for row in cursor:
-                    PIB = row["PIB"]
-                    speciality = row["speciality"]
-                await message.answer(
-                    "Вітаємо!\nВаші дані:\nПІБ: " + PIB + "\nСпеціальність: " + str(speciality), reply_markup=tch_keyboard)
+        try:
+            for row in cursor:
+                user_password = row["user_password"]
+                user_id = row["user_id"]
+                user_role = row["user_role"]
+            if user_password == password:
+                # await message.answer("Ви успішно ввійшли")
+                if user_role == 1:
+                    await UserRoles.student.set()
+                    sql = "SELECT * FROM student_data WHERE user_id = %s"
+                    cursor.execute(sql, user_id)
+                    for row in cursor:
+                        PIB = row["PIB"]
+                        sp = row["sp"]
+                        course = row["course"]
+                        group = row["st_group"]
+                    await message.answer("Вітаємо!\nВаші дані:\nПІБ: "+PIB+"\nНавчальна програма: " + sp + "\n"
+                                        "Курс: "+str(course)+"\nГрупа: "+str(group), reply_markup=st_keyboard)
+                elif user_role == 2:
+                    await UserRoles.teacher.set()
+                    sql = "SELECT * FROM teacher_data WHERE user_id = %s"
+                    cursor.execute(sql, user_id)
+                    for row in cursor:
+                        PIB = row["PIB"]
+                        speciality = row["speciality"]
+                    await message.answer(
+                        "Вітаємо!\nВаші дані:\nПІБ: " + PIB + "\nСпеціальність: " + str(speciality), reply_markup=tch_keyboard)
+                else:
+                    sql = "SELECT * FROM admin_data WHERE user_id = %s"
+                    cursor.execute(sql, user_id)
+                    for row in cursor:
+                        PIB = row["PIB"]
+                    await message.answer(
+                        "Вітаємо!\nВаші дані:\nПІБ: " + PIB, reply_markup=tch_keyboard)
             else:
-                sql = "SELECT * FROM admin_data WHERE user_id = %s"
-                cursor.execute(sql, user_id)
-                for row in cursor:
-                    PIB = row["PIB"]
-                await message.answer(
-                    "Вітаємо!\nВаші дані:\nПІБ: " + PIB, reply_markup=tch_keyboard)
-        else:
-            await message.answer("Пароль неправильний")
-        connection.commit()
+                await message.answer("Невірний логін або пароль")
+                await message.answer("Ваш логін?")
+                await FormLogin.login.set()
+            connection.commit()
+        except:
+            await message.answer("Невірний логін або пароль")
+            await message.answer("Ваш логін?")
+            await FormLogin.login.set()
 
 
 def register_handlers_login(dp: Dispatcher):
