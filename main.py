@@ -113,8 +113,8 @@ async def on_startup(_):
 async def on_shutdown(dp):
     await bot.delete_webhook()
 
-if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=False, on_startup=on_startup)
+# if __name__ == '__main__':
+#     executor.start_polling(dp, skip_updates=False, on_startup=on_startup)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
