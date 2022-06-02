@@ -9,14 +9,10 @@ storage = MemoryStorage()
 # TOKEN_API = "5397374009:AAG5m7j5hSR1IyNAOhqe9vR0Ts27xapzIho"
 
 ##Nick
-<<<<<<< HEAD
 TOKEN_API = "5118218655:AAEAYQzCRzpjppB-96ohx6PvPvCNpRHTm0c"
-=======
-# TOKEN_API = "5118218655:AAEAYQzCRzpjppB-96ohx6PvPvCNpRHTm0c"
->>>>>>> 3c8c2b0230125142d9f51c3b9c01dd362a6b878b
 
 #MAIN
-TOKEN_API = "5302840148:AAGtGfjfQZWbwRn0mqPrv_rEqRhK9XEiarg"
+#TOKEN_API = "5302840148:AAGtGfjfQZWbwRn0mqPrv_rEqRhK9XEiarg"
 # TOKEN_API = os.getenv('BOT_TOKEN')
 bot = Bot(token=TOKEN_API)
 dp = Dispatcher(bot, storage=storage)

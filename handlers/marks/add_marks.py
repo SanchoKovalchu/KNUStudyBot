@@ -11,8 +11,7 @@ from keyboard.teacher_keyboard import tch_keyboard
 
 # item to check
 check = []
-
-
+global_mark_up = None
 # state
 class FormAddMark(StatesGroup):
     speciality = State()
@@ -29,17 +28,16 @@ class FormAddMark(StatesGroup):
 # announcement
 async def marks_start(message: types.Message):
     # connect to database to get the specialities
-    global check
-    markup_list = ["Додати нову оцінку", "Редагування оцінок", "Перегляд оцінок", "Назад"]
+    global check, global_mark_up
+    global_mark_up = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=2)
+    markup_list = ["Додати нову оцінку", "Перегляд оцінок", "Назад"]
     # creating a markup
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=2)
-
-    markup.row(markup_list[0], markup_list[1])
-    markup.row(markup_list[2], markup_list[3])
+    global_mark_up.row(markup_list[0], markup_list[1])
+    global_mark_up.row(markup_list[2])
     for item in markup_list:
         check.append(item)
     await bot.send_message(message.chat.id, text="<b>Оберіть пункт меню роботи з оцінками:</b>", parse_mode='HTML',
-                           reply_markup=markup)
+                           reply_markup=global_mark_up)
 
 
 # mistake speciality
@@ -231,7 +229,7 @@ async def load_comment(message: types.Message, state: FSMContext):
 # load student
 async def load_mark(message: types.Message, state: FSMContext):
     # setting data
-    global check
+    global check, global_mark_up
     check.clear()
 
     # variables
@@ -280,7 +278,7 @@ async def load_mark(message: types.Message, state: FSMContext):
         cursor.execute(query, (marks_get, student_id))
         connection.commit()
 
-    await message.answer("Оцінка була виставлена", reply_markup=tch_keyboard)
+    await message.answer("Оцінка була виставлена", reply_markup=global_mark_up)
     await state.finish()
     await UserRoles.teacher.set()
 
