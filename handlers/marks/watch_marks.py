@@ -30,6 +30,16 @@ async def error(message: types.Message):
                                   parse_mode='HTMl')
 
 
+# inline keyboard
+def get_keyboard(data: str):
+    callback_data_edit = str(data) + '_edit'
+    callback_data_delete = str(data) + '_delete'
+    buttons = [types.InlineKeyboardButton(text="Редагувати", callback_data=callback_data_edit),
+               types.InlineKeyboardButton(text="Видалити", callback_data=callback_data_delete)]
+    keyboard = types.InlineKeyboardMarkup().add(*buttons)
+    return keyboard
+
+
 # announcement
 async def announcement_command(message: types.Message):
     # connect to database to get the specialities
@@ -47,7 +57,8 @@ async def announcement_command(message: types.Message):
     check.append("Відмінити перегляд оцінок")
 
     # output information
-    await bot.send_message(message.chat.id, text="<b>Будь-ласка, оберіть спеціальність</b>",parse_mode='HTML', reply_markup=markup)
+    await bot.send_message(message.chat.id, text="<b>Будь-ласка, оберіть спеціальність</b>", parse_mode='HTML',
+                           reply_markup=markup)
 
 
 # load speciality
@@ -72,7 +83,8 @@ async def load_speciality(message: types.Message, state: FSMContext):
             check.append(str(courses))
 
         # output course
-        await bot.send_message(message.chat.id, text="<b>Будь-ласка, оберіть курс</b>", parse_mode='HTML', reply_markup=markup)
+        await bot.send_message(message.chat.id, text="<b>Будь-ласка, оберіть курс</b>", parse_mode='HTML',
+                               reply_markup=markup)
 
 
 async def load_course(message: types.Message, state: FSMContext):
@@ -93,7 +105,8 @@ async def load_course(message: types.Message, state: FSMContext):
         check.append(cathedra['cafedra_name'])
 
     # output cathedra
-    await bot.send_message(message.chat.id, text="<b>Будь-ласка, оберіть кафедру</b>",parse_mode='HTML', reply_markup=markup)
+    await bot.send_message(message.chat.id, text="<b>Будь-ласка, оберіть кафедру</b>", parse_mode='HTML',
+                           reply_markup=markup)
 
 
 # load cathedra method
@@ -114,7 +127,8 @@ async def load_cathedra(message: types.Message, state: FSMContext):
         check.append(group['main_group'])
 
     # output subject
-    await bot.send_message(message.chat.id, text="<b>Будь-ласка, оберіть групу</b>",parse_mode='HTML' ,reply_markup=markup)
+    await bot.send_message(message.chat.id, text="<b>Будь-ласка, оберіть групу</b>", parse_mode='HTML',
+                           reply_markup=markup)
 
 
 # load subject
@@ -136,7 +150,8 @@ async def load_group(message: types.Message, state: FSMContext):
         check.append(str(subs_group['st_group']))
 
     # output group
-    await bot.send_message(message.chat.id, text="<b>Будь-ласка, оберіть підгрупу</b>",parse_mode='HTML',reply_markup=markup)
+    await bot.send_message(message.chat.id, text="<b>Будь-ласка, оберіть підгрупу</b>", parse_mode='HTML',
+                           reply_markup=markup)
 
 
 # load group
@@ -160,7 +175,8 @@ async def load_sub_group(message: types.Message, state: FSMContext):
         check.append(student['PIB'])
 
     # output sub_group
-    await bot.send_message(message.chat.id, text="<b>Будь-ласка, оберіть учня</b>",parse_mode='HTML', reply_markup=markup)
+    await bot.send_message(message.chat.id, text="<b>Будь-ласка, оберіть учня</b>", parse_mode='HTML',
+                           reply_markup=markup)
 
 
 # load sub_group
@@ -183,13 +199,15 @@ async def load_student(message: types.Message, state: FSMContext):
         check.append(subject['sb_full_name'])
 
     # output subject
-    await bot.send_message(message.chat.id, text="<b>Будь-ласка, оберіть предмет</b>",parse_mode='HTML', reply_markup=markup)
+    await bot.send_message(message.chat.id, text="<b>Будь-ласка, оберіть предмет</b>", parse_mode='HTML',
+                           reply_markup=markup)
 
 
 # load student
 async def show_marks(message: types.Message, state: FSMContext):
     # setting data
     marks_list = []
+    id_list = 0
     messages = ""
 
     async with state.proxy() as data:
@@ -201,12 +219,13 @@ async def show_marks(message: types.Message, state: FSMContext):
     student_id = 0
     for item in cursor.fetchall():
         student_id = int(item['user_id'])
-    query = "SELECT marks_information FROM students_marks WHERE id_student = %s" % student_id
+    query = "SELECT * FROM students_marks WHERE id_student = %s" % student_id
     cursor.execute(query)
 
     # getting the json item from db
     for item in cursor.fetchall():
         marks_list = json.loads(item['marks_information'])
+        id_list = str(item['id_list'])
     index = 1
     messages += f"<b>{data['subject']}</b>\n\n"
 
@@ -219,6 +238,9 @@ async def show_marks(message: types.Message, state: FSMContext):
                         f'      Дата виставлення : <b>{item["Date"]}</b>\n\n'
             summary_mark += float(item["Mark"])
             index = index + 1
+            await bot.send_message(message.chat.id, messages,
+                                   reply_markup=get_keyboard(id_list), parse_mode='HTML')
+            messages = ""
     messages += f"<b>Сумарна оцінка за даний предмет : {summary_mark}</b>"
     await bot.send_message(message.chat.id, messages, parse_mode='HTML')
 
