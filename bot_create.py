@@ -5,8 +5,11 @@ from aiogram import Bot
 import os
 storage = MemoryStorage()
 
-#Ivan
-TOKEN_API = "5397374009:AAG5m7j5hSR1IyNAOhqe9vR0Ts27xapzIho"
+# #Ivan
+# TOKEN_API = "5397374009:AAG5m7j5hSR1IyNAOhqe9vR0Ts27xapzIho"
+
+#Vlad
+TOKEN_API = "5389318857:AAEw7ltzUkw023pOjM49egfy-eSvc0FAhh0"
 
 ##Nick
 # TOKEN_API = "5118218655:AAEAYQzCRzpjppB-96ohx6PvPvCNpRHTm0c"

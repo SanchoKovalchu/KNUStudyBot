@@ -14,8 +14,7 @@ id = (str)
 msg = (str)
 
 async def cm_start_delete(callbackid : str, chat_id : str, message : str):
-    global id
-    global msg
+    global id, msg
     msg = message
     id = callbackid
     message_text = await bot.send_message(chat_id,"Ви впевнені, що хочете видалити це завдання?", reply_markup=bool)
@@ -24,7 +23,6 @@ async def cm_start_delete(callbackid : str, chat_id : str, message : str):
 async def callback_delete(call : types.CallbackQuery):
     global id
     global msg
-    print(call.data)
     if call.data == "Так":
         delete_statement = "DELETE FROM tasks where id = %s"
         cursor.execute(delete_statement, id)

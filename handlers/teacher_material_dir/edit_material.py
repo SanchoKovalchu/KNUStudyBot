@@ -6,6 +6,8 @@ from keyboard.discipline_keyboard import dsp_keyboard, disciplines
 from keyboard.teacher_keyboard import tch_keyboard
 from keyboard.file_keyboard import fl_keyboard
 
+from handlers.teacher_material_dir import view_material
+
 from handlers.login import UserRoles
 
 class FSMEditFiles(StatesGroup):
@@ -14,11 +16,13 @@ class FSMEditFiles(StatesGroup):
     change_description = State()
     change_subject = State()
 
-id = ''
-chat = ''
+id = (str)
+chat = (str)
+msg = (str)
 
-async def cm_start_edit(callbackid : str, chat_id : str):
-    global id, chat
+async def cm_start_edit(callbackid : str, chat_id : str, message : str):
+    global id, chat, msg
+    msg = message
     chat = chat_id
     id = callbackid
     await FSMEditFiles.edit_file_info.set()
@@ -76,17 +80,26 @@ async def update_subject(message : types.Message, state: FSMContext):
         data['subject'] = message.text
     await update_database(state)
 
+def msg_to_id(message : types.Message):
+    return message.message_id
+
 async def update_database(state: FSMContext):
     global id
     global chat
+    global msg
     async with state.proxy() as data:
         update_statement = "UPDATE file_storage set file_name = %s, description = %s, subject = %s WHERE id = %s"
         cursor.execute(update_statement, (data['name'], data['description'], data['subject'], id))
         connection.commit()
+    sql = "SELECT * FROM file_storage where id = %s"
+    cursor.execute(sql, id)
+    for row in cursor:
+        message_text = f'Назва: {row["file_name"]}\nОпис: {row["description"]}\nГрупи: {row["groups"]}'
+        await bot.edit_message_caption(message_id=msg_to_id(msg), chat_id=chat, caption=message_text,
+                                       reply_markup=view_material.get_keyboard(row["id"]))
     await state.finish()
     await UserRoles.teacher.set()
     await bot.send_message(chat, "Зміни внесено до БД!", reply_markup=tch_keyboard)
-
 
 async def cancel_handler(message: types.Message, state: FSMContext):
     current_state = await state.get_state()

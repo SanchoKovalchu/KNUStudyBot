@@ -10,6 +10,8 @@ from aiogram.dispatcher.filters import Text
 
 from handlers.login import UserRoles
 
+msg_ = {}
+
 class FSMViewFiles(StatesGroup):
     discipline = State()
     choose_file = State()
@@ -30,6 +32,7 @@ def get_keyboard(data: str):
     return keyboard
 
 async def sql_read_file(message: types.message, state: FSMContext):
+    global msg_
     await message.reply(f'Усі файли з дисципліни "{message.text}": ', reply_markup=tch_keyboard)
     sql = "SELECT * FROM file_storage WHERE subject = %s"
     cursor.execute(sql, message.text)
@@ -37,28 +40,31 @@ async def sql_read_file(message: types.message, state: FSMContext):
         message_text = f'Назва: {row["file_name"]}\nОпис: {row["description"]}\nГрупи: {row["groups"]}'
         match row["file_type"]:
             case 'photo':
-                await bot.send_photo(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
+                msg = await bot.send_photo(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
             case 'video':
-                await bot.send_video(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
+                msg = await bot.send_video(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
             case 'audio':
-                await bot.send_audio(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
+                msg = await bot.send_audio(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
             case 'voice':
-                await bot.send_voice(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
+                msg = await bot.send_voice(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
             case 'animation':
-                await bot.send_animation(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
+                msg = await bot.send_animation(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
             case 'video_note':
-                await bot.send_video_note(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
+                msg = await bot.send_video_note(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
             case _:
-                await bot.send_document(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
+                msg = await bot.send_document(message.chat.id, row["file_id"], caption=message_text, reply_markup=get_keyboard(row["id"]))
+        msg_[str(row["id"])] = msg
     await state.finish()
     await UserRoles.teacher.set()
 
 async def callbacks_command(call: types.CallbackQuery):
+    global msg_
     command = call.data.split(sep="_")[1]
+    callID = call.data.split(sep="_")[0]
     if command == "edit":
-        await cm_start_edit(call.data, call.from_user.id)
+        await cm_start_edit(callID, call.from_user.id, msg_[callID])
     else:
-        await cm_start_delete(call.data, call.from_user.id)
+        await cm_start_delete(callID, call.from_user.id, msg_[callID])
 
 def register_handlers_files(dp : Dispatcher):
     dp.register_message_handler(cm_start, lambda message: message.text == "Переглянути матеріал", state=UserRoles.teacher)

@@ -6,6 +6,8 @@ from keyboard.discipline_keyboard import dsp_keyboard, disciplines
 from keyboard.student_keyboard import st_keyboard
 from keyboard.file_keyboard import fl_keyboard
 
+from handlers.student_material_dir import view_material
+
 from handlers.login import UserRoles
 
 class FSMEditFilesStudent(StatesGroup):
@@ -14,13 +16,15 @@ class FSMEditFilesStudent(StatesGroup):
     change_description = State()
     change_subject = State()
 
-id = ''
-chat = ''
+id = (str)
+chat = (str)
+msg = (str)
 
-async def cm_start_edit(callbackid : str, chat_id : str):
-    global id, chat
+async def cm_start_edit(callbackid : str, chat_id : str, message : str):
+    global id, chat, msg
     chat = chat_id
     id = callbackid
+    msg = message
     await FSMEditFilesStudent.edit_file_info.set()
     await bot.send_message(chat_id, "Які дані ви хочете змінити?", reply_markup=fl_keyboard)
 
@@ -76,13 +80,23 @@ async def update_subject(message : types.Message, state: FSMContext):
         data['subject'] = message.text
     await update_database(state)
 
+def msg_to_id(message : types.Message):
+    return message.message_id
+
 async def update_database(state: FSMContext):
     global id
     global chat
+    global msg
     async with state.proxy() as data:
         update_statement = "UPDATE file_storage_student set file_name = %s, description = %s, subject = %s WHERE id = %s"
         cursor.execute(update_statement, (data['name'], data['description'], data['subject'], id))
         connection.commit()
+    sql = "SELECT * FROM file_storage_student where id = %s"
+    cursor.execute(sql, id)
+    for row in cursor:
+        message_text = f'Назва: {row["file_name"]}\nОпис: {row["description"]}'
+        await bot.edit_message_caption(message_id=msg_to_id(msg), chat_id=chat, caption=message_text,
+                                       reply_markup=view_material.get_keyboard(row["id"]))
     await state.finish()
     await UserRoles.student.set()
     await bot.send_message(chat, "Зміни внесено до БД!", reply_markup=st_keyboard)

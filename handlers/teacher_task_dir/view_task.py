@@ -19,7 +19,7 @@ from handlers.login import UserRoles
 specialties = []
 groups = []
 
-msg = (str)
+msg_ = {}
 id = (int)
 
 class FSMViewTasks(StatesGroup):
@@ -110,7 +110,7 @@ def get_keyboard(data: str):
 
 async def show_tasks(state : FSMContext):
     global id
-    global msg
+    global msg_
     await bot.send_message(id, "<b>Завдання</b>", reply_markup=tch_keyboard, parse_mode='HTML')
     async with state.proxy() as data:
         sql = "SELECT * FROM tasks WHERE department=%s and speciality=%s and course=%s and groups=%s"
@@ -150,18 +150,20 @@ async def show_tasks(state : FSMContext):
                 case _:
                     msg = await bot.send_document(chat_id=id, document=file_id, caption=message_text,
                                             reply_markup=get_keyboard(row["id"]), parse_mode='html')
+        msg_[str(row["id"])] = msg
     await state.finish()
     await UserRoles.teacher.set()
 
 async def callback_command(call: types.CallbackQuery):
-    global msg
+    global msg_
     command = call.data.split(sep="_")[1]
+    callID = call.data.split(sep="_")[0]
     if command == "check":
-        await cm_start_check(call.data,call.from_user.id)
+        await cm_start_check(callID,call.from_user.id)
     elif command == "deleteTask":
-        await cm_start_delete(call.data,call.from_user.id, msg)
+        await cm_start_delete(callID,call.from_user.id, msg_[callID])
     else:
-        await cm_start_edit(call.data,call.from_user.id, msg)
+        await cm_start_edit(callID,call.from_user.id, msg_[callID])
 
 async def cm_start_check(callbackid : str, chat_id : str):
     sql = "SELECT subject_id, department, speciality, course, groups FROM tasks WHERE id = %s"

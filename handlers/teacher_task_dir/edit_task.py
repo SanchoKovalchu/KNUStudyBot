@@ -1,9 +1,14 @@
+import aiogram.types.input_media
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from bot_create import cursor, bot, connection
 from aiogram import types, Dispatcher
 from keyboard.teacher_keyboard import tch_keyboard
 from keyboard.task_keyboard import changes_keyboard
+
+from handlers.teacher_task_dir import view_task
+
+from datetime import datetime
 
 from handlers.login import UserRoles
 
@@ -88,13 +93,49 @@ async def update_file(message : types.Message, state: FSMContext):
         data["file_id"] += ";" + str(message.content_type)
     await update_database(state)
 
+def msg_to_id(message : types.Message):
+    return message.message_id
+
 async def update_database(state: FSMContext):
     global id
     global chat
+    global msg
     async with state.proxy() as data:
         update_statement = "UPDATE tasks set task_name = %s, task_description = %s, file_id = %s WHERE id = %s"
         cursor.execute(update_statement, (data['name'], data['description'], data['file_id'], id))
         connection.commit()
+    sql = "SELECT * FROM tasks where id = %s"
+    cursor.execute(sql, id)
+    for row in cursor:
+        message_text = f'<b>{row["task_name"]}</b>\n' \
+              f'...............................................................\n' \
+              f'{row["task_description"]}\n' \
+              f'...............................................................\n' \
+              f'<b>Дедлайн</b>: <u>{str(row["deadline"])}</u>\n' \
+              f'<i>До кінця здачі залишилось: {row["deadline"] - datetime.now()}</i>\n' \
+              f'...............................................................\n'
+        if row["file_id"] == None:
+            await bot.edit_message_text(message_id=msg_to_id(msg), chat_id=chat, text=message_text,
+                                        reply_markup=view_task.get_keyboard(row["id"]), parse_mode='html')
+        else:
+            file_id = str(row["file_id"].split(sep=";")[0])
+            file_type = str(row["file_id"].split(sep=";")[1])
+            match file_type:
+                case 'photo':
+                    object = aiogram.types.input_media.InputMediaPhoto(media=file_id, caption=message_text, parse_mode='html')
+                case 'video':
+                    object = aiogram.types.input_media.InputMediaVideo(media=file_id, caption=message_text, parse_mode='html')
+                case 'audio':
+                    object = aiogram.types.input_media.InputMediaAudio(media=file_id, caption=message_text, parse_mode='html')
+                # case 'voice':
+                #     object = aiogram.types.input_media.InputMediaAudio(media=file_id, caption=message_text, parse_mode='html')
+                case 'animation':
+                    object = aiogram.types.input_media.InputMediaAnimation(media=file_id, caption=message_text, parse_mode='html')
+                # case 'video_note':
+                #     object = aiogram.types.input_media.InputMediaVideo(media=file_id, caption=message_text, parse_mode='html')
+                case _:
+                    object = aiogram.types.input_media.InputMediaDocument(media=file_id, caption=message_text, parse_mode='html')
+            await bot.edit_message_media(message_id=msg_to_id(msg), chat_id=chat, media=object)
     await state.finish()
     await UserRoles.teacher.set()
     await bot.send_message(chat, "Зміни внесено до БД!", reply_markup=tch_keyboard)
