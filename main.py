@@ -30,7 +30,7 @@ from handlers.student_material_dir import delete_material as s_delete
 from handlers.student_material_dir import view_material as s_view
 
 from bot_create import bot, dp
-from bot_create import WEBHOOK_URL, WEBHOOK_PATH, WEBAPP_HOST, WEBAPP_PORT
+# from bot_create import WEBHOOK_URL, WEBHOOK_PATH, WEBAPP_HOST, WEBAPP_PORT
 from keyboard import first_keyboard
 from user_role_files import teacher, student
 
@@ -40,7 +40,7 @@ from handlers.tests import tests, CorrectAnswer, AddTest, AddQuestions
 import aioschedule
 import asyncio
 
-from aiogram.utils.executor import start_webhook
+# from aiogram.utils.executor import start_webhook
 
 ###
 # teacher material
@@ -106,24 +106,24 @@ async def scheduler():
 
 
 async def on_startup(_):
-    await bot.set_webhook(WEBHOOK_URL, drop_pending_updates=True)
+    # await bot.set_webhook(WEBHOOK_URL, drop_pending_updates=True)
     asyncio.create_task(scheduler())
 
 
-async def on_shutdown(dp):
-    await bot.delete_webhook()
-
-# if __name__ == '__main__':
-#     executor.start_polling(dp, skip_updates=False, on_startup=on_startup)
+# async def on_shutdown(dp):
+#     await bot.delete_webhook()
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
-    start_webhook(
-        dispatcher=dp,
-        webhook_path=WEBHOOK_PATH,
-        skip_updates=True,
-        on_startup=on_startup,
-        on_shutdown=on_shutdown,
-        host=WEBAPP_HOST,
-        port=WEBAPP_PORT,
-    )
+    executor.start_polling(dp, skip_updates=False, on_startup=on_startup)
+
+# if __name__ == '__main__':
+#     logging.basicConfig(level=logging.INFO)
+#     start_webhook(
+#         dispatcher=dp,
+#         webhook_path=WEBHOOK_PATH,
+#         skip_updates=True,
+#         on_startup=on_startup,
+#         on_shutdown=on_shutdown,
+#         host=WEBAPP_HOST,
+#         port=WEBAPP_PORT,
+#     )
